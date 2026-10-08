@@ -1,0 +1,510 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>INPE CARE Field Reel — renderer</title>
+<style>html,body{margin:0;background:#000;overflow:hidden}canvas{display:block}</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+/* 인프케어 15초 쇼릴 렌더러
+   - render(t) 는 시간 t(초)에 대한 프레임을 결정적으로 그린다 (같은 t → 같은 그림)
+   - render.js 가 0~449 프레임을 돌며 캔버스를 캡처 → ffmpeg 로 mp4 인코딩
+   - ?w=1920&h=1080 (데스크톱) / ?w=1080&h=1920 (모바일) */
+const P = new URLSearchParams(location.search);
+const W = +P.get('w') || 1920, H = +P.get('h') || 1080, DUR = 15, FPS = 30;
+const c = document.getElementById('c'); c.width = W; c.height = H;
+const x = c.getContext('2d');
+const tmp = document.createElement('canvas'); tmp.width = W; tmp.height = H; const tx = tmp.getContext('2d');
+const PORT = H > W;
+const U = Math.min(W, H) / 1080;
+/* 세이프 영역: 16:10 노트북 · 19.5:9 폰에서 cover 크롭돼도 글자가 잘리지 않도록 */
+const SX = PORT ? W * 0.07 : W * 0.065, SY = PORT ? H * 0.035 : H * 0.05;
+const ORANGE = '#FF5A00', INK = '#0B0B0B', PAPER = '#F2EEE8';
+
+/* ---------- utils ---------- */
+const cl = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+const pr = (t, a, b) => cl((t - a) / (b - a));
+const lerp = (a, b, p) => a + (b - a) * p;
+const eOut = p => p >= 1 ? 1 : 1 - Math.pow(2, -10 * p);
+const eIn = p => p <= 0 ? 0 : Math.pow(2, 10 * p - 10);
+const eIO = p => p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+const eBack = p => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(p - 1, 3) + c1 * Math.pow(p - 1, 2); };
+function rng(seed) { return function () { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+
+const IMG = {};
+const NAMES = ['fabric-macro', 'sofa-01', 'sofa-02', 'sofa-03', 'sofa-04', 'mattress-01', 'mattress-02', 'mattress-03',
+  'tech-sofa', 'tech-carpet', 'tech-mattress', 'mattress-before', 'mattress-after', 'dust-pad-01', 'dust-pad-03', 'dust-pad-06',
+  'dust-pad-02', 'dust-pad-05', 'dust-bin-01', 'dust-bin-02', 'dust-hand', 'sofa-under-01', 'team-back'];
+
+function cover(img, dx, dy, dw, dh, zoom = 1, fx = .5, fy = .5) {
+  const ir = img.width / img.height, r = dw / dh;
+  let sw, sh;
+  if (ir > r) { sh = img.height; sw = sh * r; } else { sw = img.width; sh = sw / r; }
+  sw /= zoom; sh /= zoom;
+  x.drawImage(img, (img.width - sw) * fx, (img.height - sh) * fy, sw, sh, dx, dy, dw, dh);
+}
+function font(w, s) { x.font = `${w} ${s}px NK`; }
+function fit(s, w, size, max) {
+  font(w, size);
+  if (max) { const m = x.measureText(s).width; if (m > max) { size = size * max / m; font(w, size); } }
+  return size;
+}
+function txt(s, px, py, o = {}) {
+  x.save();
+  x.letterSpacing = (o.ls || 0) + 'px';
+  fit(s, o.w || 700, o.size || 40, o.max);
+  x.globalAlpha *= (o.alpha == null ? 1 : o.alpha);
+  x.fillStyle = o.color || '#fff'; x.textAlign = o.align || 'center'; x.textBaseline = o.base || 'middle';
+  x.fillText(s, px, py);
+  x.restore();
+}
+/* 마스크 위로 솟아오르는 텍스트 */
+function reveal(s, px, py, p, o = {}) {
+  if (p <= 0) return;
+  x.save();
+  x.letterSpacing = (o.ls || 0) + 'px';
+  const sz = fit(s, o.w || 800, o.size || 60, o.max);
+  const m = x.measureText(s).width;
+  const al = o.align || 'center';
+  const left = al === 'center' ? px - m / 2 : al === 'right' ? px - m : px;
+  x.beginPath(); x.rect(left - 30 * U, py - sz * .78, m + 60 * U, sz * 1.56); x.clip();
+  x.globalAlpha *= (o.alpha == null ? 1 : o.alpha);
+  x.fillStyle = o.color || '#fff'; x.textAlign = 'left'; x.textBaseline = 'middle';
+  x.fillText(s, left, py + (1 - eOut(p)) * sz * 1.15);
+  x.restore();
+}
+function flash(t, at, dur, col, max) {
+  const p = pr(t, at, at + dur);
+  if (p > 0 && p < 1) { x.save(); x.globalAlpha = (1 - p) * (max || .7); x.fillStyle = col || '#fff'; x.fillRect(0, 0, W, H); x.restore(); }
+}
+function shade(a, col) { x.save(); x.globalAlpha = a; x.fillStyle = col || '#000'; x.fillRect(0, 0, W, H); x.restore(); }
+function vgrad(y0, y1, a0, a1) {
+  const g = x.createLinearGradient(0, y0, 0, y1); g.addColorStop(0, `rgba(0,0,0,${a0})`); g.addColorStop(1, `rgba(0,0,0,${a1})`);
+  x.fillStyle = g; x.fillRect(0, Math.min(y0, y1), W, Math.abs(y1 - y0));
+}
+
+/* ---------- grain ---------- */
+const GRAIN = [];
+function buildGrain() {
+  const r = rng(7);
+  for (let k = 0; k < 4; k++) {
+    const g = document.createElement('canvas'); g.width = Math.ceil(W / 2); g.height = Math.ceil(H / 2);
+    const gx = g.getContext('2d'); const d = gx.createImageData(g.width, g.height);
+    for (let i = 0; i < d.data.length; i += 4) { const v = r() * 255; d.data[i] = d.data[i + 1] = d.data[i + 2] = v; d.data[i + 3] = 255; }
+    gx.putImageData(d, 0, 0); GRAIN.push(g);
+  }
+}
+
+/* =========================================================
+   SCENE 1 · 0.0–1.6  오프닝: 주황 라인 → 밴드 → 2,400+ 카운트
+   ========================================================= */
+function s1(t) {
+  x.fillStyle = INK; x.fillRect(0, 0, W, H);
+  const cy = H / 2;
+  const pL = eOut(pr(t, 0.05, 0.42));
+  const pB = eIO(pr(t, 0.36, 0.95));
+  const pF = eIO(pr(t, 1.12, 1.6));
+  const lw = lerp(0, PORT ? W * .9 : W * .64, pL);
+  const bw = lerp(lw, W, pF);
+  const bh = lerp(lerp(3 * U, PORT ? H * .30 : H * .44, pB), H, pF);
+  if (pB > 0) {
+    x.save(); x.beginPath(); x.rect(W / 2 - bw / 2, cy - bh / 2, bw, bh); x.clip();
+    cover(IMG['fabric-macro'], 0, 0, W, H, lerp(1.35, 1.12, pr(t, .36, 1.6)), .5, .45);
+    shade(lerp(.62, .5, pF));
+    x.restore();
+  }
+  // band edges
+  x.save(); x.globalAlpha = 1 - pF; x.fillStyle = ORANGE;
+  x.fillRect(W / 2 - lw / 2, cy - bh / 2 - 2 * U, lw, 3 * U);
+  if (pB > 0) x.fillRect(W / 2 - lw / 2, cy + bh / 2 - 1 * U, lw, 3 * U);
+  x.restore();
+  // counter
+  const pc = eOut(pr(t, .42, 1.2));
+  if (pc > 0) {
+    const n = Math.round(2400 * pc);
+    const s = n.toLocaleString('en-US') + (n >= 2400 ? '+' : '');
+    const lift = eIn(pr(t, 1.2, 1.55)) * -H * .18;
+    const a = 1 - pr(t, 1.3, 1.55);
+    txt('누적 시공 현장', W / 2, cy - (PORT ? 150 : 135) * U + lift, { size: 30 * U, w: 600, color: ORANGE, ls: 6 * U, alpha: a * cl(pc * 3) });
+    txt(s, W / 2, cy + 18 * U + lift, { size: (PORT ? 210 : 230) * U, w: 900, alpha: a, ls: -4 * U, max: W * .9 });
+  }
+  flash(t, 1.56, .1, '#fff', .8);
+}
+
+/* =========================================================
+   SCENE 2 · 1.6–3.6  현장 컷 8연타
+   ========================================================= */
+const CUTS = [['sofa-01', 'SOFA', '소파 · 패브릭', .5, .55], ['mattress-01', 'MATTRESS', '매트리스', .5, .5], ['sofa-03', 'SOFA', '소파 · 패브릭', .5, .6],
+['mattress-03', 'MATTRESS', '매트리스', .5, .5], ['tech-sofa', 'STEAM', '고온 스팀 클렌징', .45, .5], ['sofa-04', 'SOFA', '소파 · 패브릭', .5, .6],
+['mattress-02', 'MATTRESS', '매트리스', .5, .5], ['tech-carpet', 'CARPET', '카펫 · 러그', .6, .5]];
+function s2(t) {
+  const lt = t - 1.6, i = Math.min(7, Math.floor(lt / .25)), p = cl((lt - i * .25) / .25);
+  const [n, en, ko, fx, fy] = CUTS[i];
+  const dir = i % 2 ? 1 : -1;
+  x.save();
+  x.translate(W / 2 + dir * 26 * U * (1 - eOut(p)), H / 2); x.rotate(dir * .014 * (1 - eOut(p))); x.translate(-W / 2, -H / 2);
+  cover(IMG[n], -20 * U, -20 * U, W + 40 * U, H + 40 * U, lerp(1.22, 1.06, eOut(p)), fx, fy);
+  x.restore();
+  shade(.28);
+  vgrad(H * .45, H, 0, .75);
+  // giant outline word
+  x.save();
+  const big = fit(en, 900, (PORT ? 250 : 320) * U, W - SX * 2);
+  x.letterSpacing = (-4 * U) + 'px';
+  x.lineWidth = 2.2 * U; x.strokeStyle = 'rgba(255,255,255,.92)';
+  x.textAlign = 'left'; x.textBaseline = 'alphabetic';
+  x.strokeText(en, SX + (1 - eOut(p)) * 40 * U * dir, H - SY - (PORT ? 230 : 100) * U);
+  x.restore();
+  txt(ko, SX + 6 * U, H - SY - (PORT ? 200 : 72) * U - big * .02, { size: 34 * U, w: 700, color: ORANGE, align: 'left', ls: 2 * U });
+  txt(String(i + 1).padStart(2, '0') + ' / 08', W - SX, H - SY - (PORT ? 200 : 72) * U, { size: 22 * U, w: 600, color: 'rgba(255,255,255,.75)', align: 'right', ls: 4 * U });
+  if (p < .16) shade((.16 - p) / .16 * .55, '#fff');
+}
+
+/* =========================================================
+   SCENE 3 · 3.6–5.6  키네틱 타이포: 소변 / 털 / 냄새 / 바이러스
+   ========================================================= */
+function s3(t) {
+  x.fillStyle = INK; x.fillRect(0, 0, W, H);
+  // grid
+  x.save(); x.strokeStyle = 'rgba(255,255,255,.045)'; x.lineWidth = 1;
+  const gs = 90 * U, off = ((t - 3.6) * 40 * U) % gs;
+  for (let gx = -gs + off; gx < W + gs; gx += gs) { x.beginPath(); x.moveTo(gx, 0); x.lineTo(gx, H); x.stroke(); }
+  for (let gy = 0; gy < H; gy += gs) { x.beginPath(); x.moveTo(0, gy); x.lineTo(W, gy); x.stroke(); }
+  x.restore();
+  const topY = PORT ? H * .27 : H * .25;
+  txt('PET ZONE', W / 2, topY - 82 * U, { size: 22 * U, w: 600, color: ORANGE, ls: 8 * U, alpha: pr(t, 3.62, 3.9) });
+  reveal('반려견이 머문 자리에는', W / 2, topY, pr(t, 3.66, 4.05), { size: (PORT ? 76 : 70) * U, w: 800, max: W * .88 });
+  const words = ['소변', '털', '냄새', '바이러스'], beats = [4.0, 4.24, 4.48, 4.72];
+  let bw, bh, pos;
+  if (PORT) {
+    bw = (W - SX * 2 - 28 * U) / 2; bh = 300 * U;
+    pos = i => [SX + (i % 2) * (bw + 28 * U), H * .40 + Math.floor(i / 2) * (bh + 28 * U)];
+  } else {
+    bw = (W - SX * 2 - 3 * 26 * U) / 4; bh = 250 * U;
+    pos = i => [SX + i * (bw + 26 * U), H * .47];
+  }
+  words.forEach((w, i) => {
+    const p = pr(t, beats[i], beats[i] + .24); if (p <= 0) return;
+    const [bx, by] = pos(i);
+    const s = lerp(1.45, 1, eOut(p));
+    x.save();
+    x.translate(bx + bw / 2, by + bh / 2); x.scale(s, s); x.translate(-bw / 2, -bh / 2);
+    x.globalAlpha = cl(p * 4);
+    const solid = i % 2 === 0;
+    if (solid) { x.fillStyle = ORANGE; x.fillRect(0, 0, bw, bh); }
+    else { x.strokeStyle = '#fff'; x.lineWidth = 3 * U; x.strokeRect(1.5 * U, 1.5 * U, bw - 3 * U, bh - 3 * U); }
+    x.restore();
+    x.save(); x.translate(bx + bw / 2, by + bh / 2); x.scale(s, s);
+    txt(w, 0, 6 * U, { size: (PORT ? 120 : 112) * U, w: 900, color: solid ? INK : '#fff', max: bw * .82, alpha: cl(p * 4) });
+    txt('0' + (i + 1), -bw / 2 + 22 * U, -bh / 2 + 26 * U, { size: 18 * U, w: 700, color: solid ? 'rgba(11,11,11,.7)' : 'rgba(255,255,255,.6)', align: 'left', ls: 3 * U, alpha: cl(p * 4) });
+    x.restore();
+  });
+  txt('소파와 매트리스는 매일 피부가 닿는 곳입니다', W / 2, PORT ? H * .82 : H * .86, { size: 30 * U, w: 500, color: 'rgba(255,255,255,.72)', alpha: pr(t, 4.95, 5.2), max: W * .86 });
+  // glitch out
+  const g = pr(t, 5.3, 5.6);
+  if (g > 0) {
+    tx.clearRect(0, 0, W, H); tx.drawImage(c, 0, 0);
+    x.fillStyle = INK; x.fillRect(0, 0, W, H);
+    const r = rng(Math.floor(t * 30)); const sl = 14;
+    for (let k = 0; k < sl; k++) {
+      const sh = H / sl, dx = (r() - .5) * W * .5 * eIn(g) * 2;
+      x.drawImage(tmp, 0, k * sh, W, sh, dx, k * sh, W, sh);
+    }
+    if (g > .5) shade((g - .5) * 2 * .9, INK);
+  }
+}
+
+/* =========================================================
+   SCENE 4 · 5.6–8.0  비포/애프터 UV 스캔
+   ========================================================= */
+function s4(t) {
+  x.fillStyle = INK; x.fillRect(0, 0, W, H);
+  x.save(); x.filter = 'blur(28px) brightness(.32)'; cover(IMG['mattress-before'], -60, -60, W + 120, H + 120, 1.1); x.restore();
+  let pw, ph, px, py;
+  if (PORT) { pw = W * .86; ph = pw / 1.2; px = (W - pw) / 2; py = H * .17; }
+  else { ph = H * .66; pw = ph * 1.2; px = W * .09; py = (H - ph) / 2 + 10 * U; }
+  const pin = eOut(pr(t, 5.6, 5.95));
+  const sc = lerp(1.08, 1, pin);
+  const exitP = eIn(pr(t, 7.78, 8.0));
+  x.save();
+  x.globalAlpha = pin;
+  x.translate(px + pw / 2, py + ph / 2); x.scale(sc + exitP * .5, sc + exitP * .5); x.translate(-(px + pw / 2), -(py + ph / 2));
+  // shadow + frame
+  x.save(); x.shadowColor = 'rgba(0,0,0,.5)'; x.shadowBlur = 60 * U; x.shadowOffsetY = 24 * U; x.fillStyle = '#000'; x.fillRect(px, py, pw, ph); x.restore();
+  cover(IMG['mattress-before'], px, py, pw, ph, 1.02);
+  const sp = eIO(pr(t, 6.0, 7.45));
+  const bx = px + pw * sp;
+  if (sp > 0) {
+    x.save(); x.beginPath(); x.rect(px, py, bx - px, ph); x.clip(); cover(IMG['mattress-after'], px, py, pw, ph, 1.02); x.restore();
+    // UV bar
+    const gw = 150 * U;
+    const g = x.createLinearGradient(bx - gw, 0, bx + gw * .4, 0);
+    g.addColorStop(0, 'rgba(124,92,255,0)'); g.addColorStop(.72, 'rgba(150,120,255,.38)'); g.addColorStop(.9, 'rgba(220,210,255,.75)'); g.addColorStop(1, 'rgba(124,92,255,0)');
+    x.save(); x.globalAlpha = sp < 1 ? 1 : 1 - pr(t, 7.45, 7.6);
+    x.fillStyle = g; x.fillRect(bx - gw, py, gw * 1.4, ph);
+    x.fillStyle = '#fff'; x.fillRect(bx - 1.5 * U, py - 14 * U, 3 * U, ph + 28 * U);
+    x.restore();
+  }
+  // chips
+  const chip = (label, cx, bg, fg, a) => {
+    x.save(); x.globalAlpha *= a; font(700, 20 * U); x.letterSpacing = 4 * U + 'px';
+    const m = x.measureText(label).width + 36 * U;
+    x.fillStyle = bg; x.fillRect(cx, py + 20 * U, m, 40 * U);
+    x.fillStyle = fg; x.textBaseline = 'middle'; x.textAlign = 'left'; x.fillText(label, cx + 18 * U, py + 41 * U);
+    x.restore(); return m;
+  };
+  chip('BEFORE', px + 20 * U, 'rgba(0,0,0,.72)', '#fff', 1 - pr(t, 7.1, 7.3));
+  const am = 150 * U;
+  chip('AFTER', px + pw - am, ORANGE, '#fff', pr(t, 6.9, 7.2));
+  x.restore();
+  txt('실제 시공 사진 · 매트리스 얼룩 · 오염 제거', px + pw / 2, py + ph + 44 * U, { size: 22 * U, w: 500, color: 'rgba(255,255,255,.6)', alpha: pin * (1 - exitP), ls: 1 * U });
+  // steps
+  const steps = ['UV-C 살균', '고성능 건식 흡입', '습식 · 고온 스팀', '음이온 탈취 마감'];
+  let sx, sy, gap;
+  if (PORT) { sx = W * .07; sy = py + ph + 215 * U; gap = 96 * U; }
+  else { sx = px + pw + 110 * U; sy = H * .34; gap = 104 * U; }
+  const head = pr(t, 5.75, 6.1);
+  reveal('UV 살균부터 탈취까지', sx, sy - (PORT ? 70 : 92) * U, head, { size: (PORT ? 56 : 54) * U, w: 800, align: 'left', alpha: 1 - exitP, max: PORT ? W * .86 : W - sx - 60 * U });
+  steps.forEach((s, i) => {
+    const on = sp > (i + .5) / 4.2 || (i === 0 && sp > .02);
+    const a = pr(t, 5.9 + i * .08, 6.15 + i * .08) * (1 - exitP);
+    const yy = sy + i * gap;
+    x.save(); x.globalAlpha = a;
+    x.strokeStyle = on ? ORANGE : 'rgba(255,255,255,.35)'; x.lineWidth = 2 * U;
+    x.beginPath(); x.arc(sx + 22 * U, yy, 22 * U, 0, Math.PI * 2);
+    if (on) { x.fillStyle = ORANGE; x.fill(); } x.stroke();
+    if (on) { x.strokeStyle = '#fff'; x.lineWidth = 3.4 * U; x.beginPath(); x.moveTo(sx + 12 * U, yy); x.lineTo(sx + 19 * U, yy + 7 * U); x.lineTo(sx + 32 * U, yy - 7 * U); x.stroke(); }
+    x.restore();
+    txt('0' + (i + 1), sx + 70 * U, yy, { size: 20 * U, w: 700, color: on ? ORANGE : 'rgba(255,255,255,.4)', align: 'left', ls: 2 * U, alpha: a });
+    txt(s, sx + 116 * U, yy + 1 * U, { size: 40 * U, w: on ? 800 : 500, color: on ? '#fff' : 'rgba(255,255,255,.45)', align: 'left', alpha: a });
+  });
+  flash(t, 7.92, .1, '#fff', .85);
+}
+
+/* =========================================================
+   SCENE 5 · 8.0–10.0  현장 필터 증거 (밝은 화면 전환)
+   ========================================================= */
+function s5(t) {
+  x.fillStyle = PAPER; x.fillRect(0, 0, W, H);
+  const cards = [['dust-pad-03', -8], ['dust-pad-01', 3], ['dust-pad-06', 9]];
+  let ch, cw, cpos;
+  if (PORT) { cw = W * .44; ch = cw * 1.3; cpos = [[W * .30, H * .64], [W * .52, H * .66], [W * .73, H * .63]]; }
+  else { ch = H * .62; cw = ch * .78; cpos = [[W * .62, H * .52], [W * .74, H * .55], [W * .86, H * .51]]; }
+  const zoom = eIn(pr(t, 9.35, 10.0));
+  x.save();
+  const [zx, zy] = cpos[1];
+  x.translate(zx, zy); x.scale(1 + zoom * 2.4, 1 + zoom * 2.4); x.translate(-zx, -zy);
+  // text
+  const tx0 = PORT ? W / 2 : Math.max(SX, W * .075), al = PORT ? 'center' : 'left';
+  const ty = PORT ? H * .19 : H * .40;
+  txt('PROOF  ·  현장 필터', tx0, ty - 110 * U, { size: 22 * U, w: 700, color: ORANGE, align: al, ls: 6 * U, alpha: pr(t, 8.05, 8.3) });
+  reveal('눈에 안 보이던', tx0, ty - 18 * U, pr(t, 8.08, 8.45), { size: 92 * U, w: 900, color: INK, align: al, max: PORT ? W * .9 : W * .36 });
+  reveal('것까지 꺼냅니다', tx0, ty + 88 * U, pr(t, 8.18, 8.55), { size: 92 * U, w: 900, color: INK, align: al, max: PORT ? W * .9 : W * .36 });
+  txt('소파 · 매트리스 속 먼지 · 각질 · 털', tx0, ty + 180 * U, { size: 28 * U, w: 500, color: '#55504a', align: al, alpha: pr(t, 8.45, 8.75), max: PORT ? W * .9 : W * .36 });
+  txt('필터에 걸러진 실제 오염물입니다', tx0, ty + 222 * U, { size: 28 * U, w: 500, color: '#55504a', align: al, alpha: pr(t, 8.5, 8.8), max: PORT ? W * .9 : W * .36 });
+  cards.forEach(([n, rot], i) => {
+    const t0 = 8.15 + i * .17; const p = pr(t, t0, t0 + .5); if (p <= 0) return;
+    const e = eBack(p);
+    const [cx, cy] = cpos[i];
+    x.save();
+    x.translate(cx, cy + (1 - e) * H * .75); x.rotate((rot * (1 + (1 - e) * 2.5)) * Math.PI / 180);
+    x.shadowColor = 'rgba(40,30,20,.28)'; x.shadowBlur = 50 * U; x.shadowOffsetY = 26 * U;
+    x.fillStyle = '#fff'; x.fillRect(-cw / 2, -ch / 2, cw, ch);
+    x.shadowColor = 'transparent';
+    const b = 14 * U;
+    cover(IMG[n], -cw / 2 + b, -ch / 2 + b, cw - b * 2, ch - b * 2 - 40 * U, 1.05);
+    txt('FILTER #0' + (i + 1), -cw / 2 + b + 4 * U, ch / 2 - 26 * U, { size: 18 * U, w: 700, color: '#8a837b', align: 'left', ls: 3 * U });
+    x.restore();
+  });
+  x.restore();
+  if (zoom > 0) shade(eIn(pr(t, 9.7, 10.0)), '#0A0C10');
+}
+
+/* =========================================================
+   SCENE 6 · 10.0–12.0  파보 · 칼리시 방역
+   ========================================================= */
+const VIR = (() => { const r = rng(42), a = []; for (let i = 0; i < 74; i++) a.push({ x: r(), y: r(), s: 12 + r() * 34, rot: r() * 6.28, n: 8 + Math.floor(r() * 5), o: r() < .38, ph: r() * 6.28, d: r() }); return a; })();
+function virus(cx, cy, r, rot, n, col, a) {
+  x.save(); x.globalAlpha = a; x.translate(cx, cy); x.rotate(rot);
+  x.strokeStyle = col; x.fillStyle = col; x.lineWidth = Math.max(1.4, r * .09);
+  x.beginPath(); x.arc(0, 0, r, 0, Math.PI * 2); x.stroke();
+  x.globalAlpha = a * .14; x.fill(); x.globalAlpha = a;
+  for (let k = 0; k < n; k++) {
+    const ang = k / n * Math.PI * 2;
+    const x1 = Math.cos(ang) * r, y1 = Math.sin(ang) * r, x2 = Math.cos(ang) * r * 1.45, y2 = Math.sin(ang) * r * 1.45;
+    x.beginPath(); x.moveTo(x1, y1); x.lineTo(x2, y2); x.stroke();
+    x.beginPath(); x.arc(x2, y2, r * .13, 0, Math.PI * 2); x.fill();
+  }
+  x.restore();
+}
+function s6(t) {
+  x.fillStyle = '#0A0C10'; x.fillRect(0, 0, W, H);
+  const lt = t - 10, cx = W / 2, cy = H / 2;
+  const R = eIO(pr(t, 10.55, 11.75)) * Math.hypot(W, H) * .62;
+  if (R > 0) {
+    const g = x.createRadialGradient(cx, cy, 0, cx, cy, R);
+    g.addColorStop(0, 'rgba(255,255,255,.07)'); g.addColorStop(.85, 'rgba(255,255,255,.05)'); g.addColorStop(1, 'rgba(255,120,40,.10)');
+    x.fillStyle = g; x.beginPath(); x.arc(cx, cy, R, 0, Math.PI * 2); x.fill();
+  }
+  const appear = eOut(pr(t, 10.0, 10.35));
+  VIR.forEach(v => {
+    const vx = v.x * W + Math.sin(lt * .9 + v.ph) * 22 * U, vy = v.y * H + Math.cos(lt * .7 + v.ph) * 22 * U;
+    const d = Math.hypot(vx - cx, vy - cy);
+    const k = R > 0 ? cl((R - d) / (170 * U)) : 0;
+    const sz = v.s * U * appear * (1 - k);
+    const col = v.o ? ORANGE : '#8f99a8';
+    if (sz > .5) virus(vx, vy, sz, v.rot + lt * .4 * (v.d - .5), v.n, col, (.35 + v.d * .55) * (1 - k));
+    if (k > 0 && k < 1) {
+      x.save(); x.fillStyle = col; x.globalAlpha = (1 - k) * .7;
+      for (let q = 0; q < 5; q++) { const an = v.ph + q * 1.256; const rr = k * 46 * U; x.beginPath(); x.arc(vx + Math.cos(an) * rr, vy + Math.sin(an) * rr, 2.2 * U, 0, Math.PI * 2); x.fill(); }
+      x.restore();
+    }
+  });
+  if (R > 0 && R < Math.hypot(W, H) * .6) { x.save(); x.strokeStyle = 'rgba(255,90,0,.85)'; x.lineWidth = 3 * U; x.beginPath(); x.arc(cx, cy, R, 0, Math.PI * 2); x.stroke(); x.restore(); }
+  // legibility pad
+  const pad = x.createRadialGradient(cx, cy, 0, cx, cy, (PORT ? W * .75 : W * .45));
+  pad.addColorStop(0, 'rgba(10,12,16,.82)'); pad.addColorStop(1, 'rgba(10,12,16,0)');
+  x.fillStyle = pad; x.fillRect(0, 0, W, H);
+  txt('PET VIRUS CONTROL', cx, cy - (PORT ? 190 : 170) * U, { size: 22 * U, w: 700, color: ORANGE, ls: 8 * U, alpha: pr(t, 10.15, 10.4) });
+  reveal('파보 · 칼리시', cx, cy - 40 * U, pr(t, 10.2, 10.6), { size: 136 * U, w: 900, max: W * .88, ls: -2 * U });
+  reveal('감염 이후, 생활 공간 방역까지', cx, cy + 84 * U, pr(t, 10.55, 10.9), { size: 46 * U, w: 600, color: '#dde2ea', max: W * .88 });
+  txt('환경부 승인 항바이러스 성능 인증 제품 사용', cx, cy + 172 * U, { size: 25 * U, w: 600, color: ORANGE, ls: 2 * U, alpha: pr(t, 10.95, 11.25), max: W * .88 });
+  flash(t, 11.93, .1, '#fff', .6);
+}
+
+/* =========================================================
+   SCENE 7 · 12.0–13.6  모자이크 + 숫자
+   ========================================================= */
+const MOS = ['sofa-01', 'dust-pad-02', 'mattress-02', 'tech-mattress', 'sofa-03', 'dust-bin-01', 'mattress-03', 'sofa-under-01', 'dust-pad-05', 'sofa-04', 'mattress-01', 'dust-hand', 'sofa-02', 'dust-bin-02', 'tech-sofa'];
+const ORDER = (() => { const r = rng(9), a = MOS.map((_, i) => i); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; })();
+function s7(t) {
+  x.fillStyle = INK; x.fillRect(0, 0, W, H);
+  const cols = PORT ? 3 : 5, rows = PORT ? 5 : 3, tw = W / cols, th = H / rows, gap = 3 * U;
+  for (let i = 0; i < cols * rows; i++) {
+    const t0 = 12.0 + ORDER.indexOf(i % MOS.length) * .028;
+    const p = eOut(pr(t, t0, t0 + .32)); if (p <= 0) continue;
+    const cx0 = (i % cols) * tw, cy0 = Math.floor(i / cols) * th;
+    x.save(); x.translate(cx0 + tw / 2, cy0 + th / 2); x.scale(p, p);
+    cover(IMG[MOS[i % MOS.length]], -tw / 2 + gap, -th / 2 + gap, tw - gap * 2, th - gap * 2, lerp(1.25, 1.1, pr(t, 12, 13.6)));
+    x.restore();
+  }
+  shade(lerp(.15, .66, pr(t, 12.3, 12.55)));
+  const stats = [['4.97', '고객 만족도'], ['2,400+', '누적 시공'], ['0원', '수도권 출장비']], times = [12.42, 12.68, 12.94];
+  stats.forEach(([n, l], i) => {
+    const p = pr(t, times[i], times[i] + .32); if (p <= 0) return;
+    const sx = PORT ? W / 2 : W * (.2 + i * .3), sy = PORT ? H * (.3 + i * .2) : H / 2;
+    const s = lerp(1.5, 1, eOut(p));
+    x.save(); x.translate(sx, sy); x.scale(s, s);
+    txt(n, 0, -20 * U, { size: 170 * U, w: 900, ls: -4 * U, alpha: cl(p * 3), max: PORT ? W * .8 : W * .28 });
+    txt(l, 0, 100 * U, { size: 34 * U, w: 600, color: ORANGE, ls: 3 * U, alpha: cl(p * 3) });
+    x.restore();
+    if (!PORT && i > 0) { x.save(); x.globalAlpha = cl(p * 3) * .35; x.fillStyle = '#fff'; x.fillRect(W * (.05 + i * .3), H * .36, 1.5 * U, H * .28); x.restore(); }
+  });
+  const ex = eIn(pr(t, 13.42, 13.6));
+  if (ex > 0) { x.fillStyle = INK; x.fillRect(0, 0, W, H * ex / 2); x.fillRect(0, H - H * ex / 2, W, H * ex / 2); }
+}
+
+/* =========================================================
+   SCENE 8 · 13.6–15.0  팀 → 엔드 카드
+   ========================================================= */
+function s8(t) {
+  x.fillStyle = INK; x.fillRect(0, 0, W, H);
+  if (t < 14.5) {
+    cover(IMG['team-back'], 0, 0, W, H, lerp(1.18, 1.05, eOut(pr(t, 13.6, 14.5))), .5, PORT ? .6 : .92);
+    vgrad(H * .35, H, 0, .85);
+    const op = eOut(pr(t, 13.6, 13.75)); if (op < 1) { x.fillStyle = INK; x.fillRect(0, 0, W, H / 2 * (1 - op)); x.fillRect(0, H - H / 2 * (1 - op), W, H / 2 * (1 - op)); }
+    const lx = PORT ? W / 2 : SX, al = PORT ? 'center' : 'left';
+    txt('INPE CARE FIELD TEAM', lx, H - (PORT ? 330 : 250) * U, { size: 22 * U, w: 700, color: ORANGE, align: al, ls: 6 * U, alpha: pr(t, 13.72, 13.95) });
+    reveal('사람이 직접, 끝까지.', lx, H - (PORT ? 230 : 160) * U, pr(t, 13.78, 14.1), { size: (PORT ? 104 : 116) * U, w: 900, align: al, max: W * .9 });
+  }
+  // wipes
+  const w1 = eIO(pr(t, 14.18, 14.42)), w2 = eIO(pr(t, 14.28, 14.52));
+  if (w1 > 0) { x.fillStyle = ORANGE; x.fillRect(0, 0, W * w1, H); }
+  if (w2 > 0) { x.fillStyle = INK; x.fillRect(0, 0, W * w2, H); }
+  if (t >= 14.45) endCard(t);
+}
+function endCard(t) {
+  x.fillStyle = INK; x.fillRect(0, 0, W, H);
+  // thin frame
+  x.save(); x.globalAlpha = pr(t, 14.5, 14.8) * .14; x.strokeStyle = '#fff'; x.lineWidth = 1.2 * U; x.strokeRect(SX - 20 * U, SY, W - (SX - 20 * U) * 2, H - SY * 2); x.restore();
+  const ls = 160 * U;
+  const lp = eBack(pr(t, 14.45, 14.78));
+  let lx, ly, tx0, al, wy;
+  if (PORT) { lx = W / 2 - ls / 2; ly = H * .36 - ls / 2; tx0 = W / 2; al = 'center'; wy = H * .36 + 170 * U; }
+  else {
+    font(900, 150 * U); const ww = x.measureText('인프케어').width;
+    const gw = ls + 54 * U + ww; lx = W / 2 - gw / 2; ly = H * .42 - ls / 2; tx0 = lx + ls + 54 * U; al = 'left'; wy = H * .42;
+  }
+  x.save(); x.translate(lx + ls / 2, ly + ls / 2); x.scale(lp, lp);
+  const L = IMG['logo']; x.drawImage(L, -ls / 2 * (L.width / L.height), -ls / 2, ls * (L.width / L.height), ls);
+  x.restore();
+  reveal('인프케어', tx0, wy, pr(t, 14.52, 14.8), { size: 150 * U, w: 900, align: al, ls: -4 * U });
+  txt('INPE CARE', tx0 + (PORT ? 0 : 6 * U), wy + (PORT ? 112 : 112) * U, { size: 30 * U, w: 300, color: '#9a9a9a', align: al, ls: 14 * U, alpha: pr(t, 14.62, 14.82) });
+  const tagY = PORT ? wy + 200 * U : H * .66;
+  txt('반려견 소파 · 매트리스 청소  |  소변 냄새 제거  |  파보 · 칼리시 방역', W / 2, tagY, { size: (PORT ? 30 : 30) * U, w: 500, color: '#d6d6d6', alpha: pr(t, 14.68, 14.88), max: W * .88 });
+  txt('0507-1314-5792   ·   inpe.kr', W / 2, tagY + 64 * U, { size: 26 * U, w: 700, color: ORANGE, ls: 3 * U, alpha: pr(t, 14.74, 14.92) });
+}
+
+/* ---------- HUD ---------- */
+const LABELS = [[0, '01  OPEN'], [1.6, '02  FIELD'], [3.6, '03  PET ZONE'], [5.6, '04  UV CARE'], [8, '05  PROOF'], [10, '06  VIRUS'], [12, '07  DATA'], [13.6, '08  TEAM']];
+function hud(t, light) {
+  const a = 1 - pr(t, 14.3, 14.5);
+  if (a <= 0) return;
+  const col = light ? 'rgba(11,11,11,.6)' : 'rgba(255,255,255,.62)';
+  const m = SX, mt = SY + 8 * U;
+  x.save(); x.globalAlpha = a;
+  txt('INPE CARE — FIELD REEL 2026', m, mt, { size: 17 * U, w: 600, color: col, align: 'left', ls: 3.5 * U });
+  const f = Math.min(449, Math.round(t * FPS)), sec = Math.floor(f / FPS), ff = f % FPS;
+  const tc = `00:00:${String(sec).padStart(2, '0')}:${String(ff).padStart(2, '0')}`;
+  txt(tc, W - m, mt, { size: 17 * U, w: 600, color: col, align: 'right', ls: 3 * U });
+  font(600, 17 * U); x.letterSpacing = 3 * U + 'px';
+  const tw = x.measureText(tc).width;
+  if (Math.floor(t * 2) % 2 === 0) { x.fillStyle = ORANGE; x.beginPath(); x.arc(W - m - tw - 18 * U, mt, 5 * U, 0, Math.PI * 2); x.fill(); }
+  // progress
+  const py = H - SY - 6 * U;
+  x.fillStyle = light ? 'rgba(11,11,11,.18)' : 'rgba(255,255,255,.2)'; x.fillRect(m, py, W - m * 2, 2 * U);
+  x.fillStyle = ORANGE; x.fillRect(m, py, (W - m * 2) * (t / DUR), 2 * U);
+  let lab = LABELS[0][1]; LABELS.forEach(([s, l]) => { if (t >= s) lab = l; });
+  txt(lab, m, py - 20 * U, { size: 15 * U, w: 700, color: col, align: 'left', ls: 3 * U });
+  txt('INCHEON · SEOUL · GYEONGGI', W - m, py - 20 * U, { size: 15 * U, w: 600, color: col, align: 'right', ls: 3 * U });
+  x.restore();
+}
+
+/* ---------- main ---------- */
+window.render = function (t) {
+  x.setTransform(1, 0, 0, 1, 0, 0); x.globalAlpha = 1; x.filter = 'none';
+  let light = false;
+  if (t < 1.6) s1(t);
+  else if (t < 3.6) s2(t);
+  else if (t < 5.6) s3(t);
+  else if (t < 8.0) s4(t);
+  else if (t < 10.0) { s5(t); light = t < 9.6; }
+  else if (t < 12.0) s6(t);
+  else if (t < 13.6) s7(t);
+  else s8(t);
+  // vignette
+  const vg = x.createRadialGradient(W / 2, H / 2, Math.min(W, H) * .35, W / 2, H / 2, Math.hypot(W, H) * .62);
+  vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, light ? 'rgba(60,40,20,.16)' : 'rgba(0,0,0,.42)');
+  x.fillStyle = vg; x.fillRect(0, 0, W, H);
+  hud(t, light);
+  // grain
+  x.save(); x.globalAlpha = light ? .035 : .055; x.globalCompositeOperation = 'overlay';
+  x.drawImage(GRAIN[Math.floor(t * FPS) % GRAIN.length], 0, 0, W, H);
+  x.restore();
+};
+
+(async function boot() {
+  const f = new FontFace('NK', 'url(NotoSansKR-VF.ttf)', { weight: '100 900' });
+  await f.load(); document.fonts.add(f);
+  const base = '../assets/img/real/';
+  await Promise.all(NAMES.map(n => new Promise((res, rej) => { const i = new Image(); i.onload = () => { IMG[n] = i; res(); }; i.onerror = () => rej(n); i.src = base + n + '.jpg'; })));
+  await new Promise((res, rej) => { const i = new Image(); i.onload = () => { IMG.logo = i; res(); }; i.onerror = rej; i.src = '../assets/img/logo-512.png'; });
+  buildGrain();
+  window.render(+(P.get('t') || 0));
+  window.READY = true;
+})();
+</script>
+</body>
+</html>

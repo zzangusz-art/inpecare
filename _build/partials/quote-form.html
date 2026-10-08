@@ -1,0 +1,113 @@
+<form class="qform" data-form="{{fid}}" novalidate aria-label="무료 견적 신청서">
+  <ol class="qform__steps" aria-hidden="true"><li>서비스</li><li>상태 · 사진</li><li>지역 · 일정</li><li>연락처</li></ol>
+
+  <fieldset class="qstep" data-need="items" style="border:0;padding:0;margin:0">
+    <h3>무엇을 맡기시나요?</h3>
+    <div class="field">
+      <span class="label">품목 <em>*</em> <small class="muted">(여러 개 선택 가능)</small></span>
+      <div class="seg">
+        <input type="checkbox" name="items" id="{{fid}}-i1" value="소파"><label for="{{fid}}-i1">소파</label>
+        <input type="checkbox" name="items" id="{{fid}}-i2" value="매트리스"><label for="{{fid}}-i2">매트리스</label>
+        <input type="checkbox" name="items" id="{{fid}}-i3" value="카펫·러그"><label for="{{fid}}-i3">카펫 · 러그</label>
+        <input type="checkbox" name="items" id="{{fid}}-i4" value="반려동물 방역"><label for="{{fid}}-i4">반려동물 방역</label>
+        <input type="checkbox" name="items" id="{{fid}}-i5" value="기타"><label for="{{fid}}-i5">기타</label>
+      </div>
+      <p class="field__err">맡기실 품목을 하나 이상 선택해 주세요.</p>
+    </div>
+    <div class="field">
+      <span class="label">반려동물 상황</span>
+      <div class="seg">
+        <input type="checkbox" name="pet" id="{{fid}}-p1" value="소변·배변 오염"><label for="{{fid}}-p1">소변 · 배변 오염</label>
+        <input type="checkbox" name="pet" id="{{fid}}-p2" value="구토 오염"><label for="{{fid}}-p2">구토 오염</label>
+        <input type="checkbox" name="pet" id="{{fid}}-p3" value="털·비듬·냄새"><label for="{{fid}}-p3">털 · 비듬 · 냄새</label>
+        <input type="checkbox" name="pet" id="{{fid}}-p4" value="파보·칼리시 감염 후"><label for="{{fid}}-p4">파보 · 칼리시 감염 후</label>
+        <input type="checkbox" name="pet" id="{{fid}}-p5" value="예방·정기 관리"><label for="{{fid}}-p5">예방 · 정기 관리</label>
+      </div>
+    </div>
+    <div class="field">
+      <span class="label">함께 사는 아이</span>
+      <div class="seg">
+        <input type="radio" name="petType" id="{{fid}}-t1" value="강아지" checked><label for="{{fid}}-t1">강아지</label>
+        <input type="radio" name="petType" id="{{fid}}-t2" value="고양이"><label for="{{fid}}-t2">고양이</label>
+        <input type="radio" name="petType" id="{{fid}}-t3" value="강아지·고양이"><label for="{{fid}}-t3">둘 다</label>
+        <input type="radio" name="petType" id="{{fid}}-t4" value="기타·없음"><label for="{{fid}}-t4">기타 · 없음</label>
+      </div>
+    </div>
+  </fieldset>
+
+  <fieldset class="qstep" style="border:0;padding:0;margin:0" hidden>
+    <h3>상태를 알려주시면 더 정확해져요</h3>
+    <div class="field">
+      <label for="{{fid}}-detail">사이즈 · 수량 · 오염 위치</label>
+      <textarea class="textarea" id="{{fid}}-detail" name="detail" placeholder="예) 퀸 매트리스 1개, 3인 패브릭 소파. 매트리스 가운데 소변 자국 2군데, 냄새가 오래됨"></textarea>
+    </div>
+    <div class="field upl">
+      <span class="label">사진 첨부 <small class="muted">(선택 · 최대 3장)</small></span>
+      <label class="upl__drop" for="{{fid}}-file">
+        <svg class="ico"><use href="#i-camera"/></svg>
+        <span><b>오염 부위 사진을 올려주세요</b><small>방문 전에 금액을 확정해 드립니다. 자동으로 용량을 줄여 전송합니다.</small></span>
+      </label>
+      <input class="sr-only" type="file" id="{{fid}}-file" accept="image/*" multiple>
+      <div class="upl__list"></div>
+    </div>
+  </fieldset>
+
+  <fieldset class="qstep" data-need="region" style="border:0;padding:0;margin:0" hidden>
+    <h3>어디로 방문할까요?</h3>
+    <div class="row2">
+      <div class="field">
+        <label for="{{fid}}-region">지역 <em>*</em></label>
+        <select class="select" id="{{fid}}-region" name="region">
+          <option value="">선택해 주세요</option>
+          <option>서울</option><option>인천</option><option>경기</option><option>기타 지역</option>
+        </select>
+        <p class="field__err">지역을 선택해 주세요.</p>
+      </div>
+      <div class="field">
+        <label for="{{fid}}-area">시 · 구 · 동</label>
+        <input class="input" id="{{fid}}-area" name="area" placeholder="예) 남동구 구월동" autocomplete="address-level2">
+      </div>
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label for="{{fid}}-date">희망 날짜</label>
+        <input class="input" type="date" id="{{fid}}-date" name="date">
+      </div>
+      <div class="field">
+        <label for="{{fid}}-time">희망 시간대</label>
+        <select class="select" id="{{fid}}-time" name="time">
+          <option value="">상관없음</option><option>오전 (9~12시)</option><option>오후 (12~15시)</option><option>늦은 오후 (15~18시)</option>
+        </select>
+      </div>
+    </div>
+    <p class="note"><svg class="ico"><use href="#i-pin"/></svg><span>서울 · 인천 · 경기는 출장비가 없습니다. 도서 · 산간 지역은 상담 시 안내드립니다.</span></p>
+  </fieldset>
+
+  <fieldset class="qstep" data-need="contact" style="border:0;padding:0;margin:0" hidden>
+    <h3>연락받으실 정보를 남겨주세요</h3>
+    <div class="row2">
+      <div class="field">
+        <label for="{{fid}}-name">성함 <em>*</em></label>
+        <input class="input" id="{{fid}}-name" name="name" autocomplete="name" placeholder="홍길동">
+        <p class="field__err">성함을 2자 이상 입력해 주세요.</p>
+      </div>
+      <div class="field">
+        <label for="{{fid}}-phone">연락처 <em>*</em></label>
+        <input class="input num" id="{{fid}}-phone" name="phone" type="tel" inputmode="numeric" autocomplete="tel" placeholder="010-0000-0000">
+        <p class="field__err">연락 가능한 번호를 정확히 입력해 주세요.</p>
+      </div>
+    </div>
+    <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+    <div class="qform__summary" aria-live="polite"></div>
+    <div class="field">
+      <div class="consent"><input type="checkbox" name="agree" id="{{fid}}-agree"><label for="{{fid}}-agree">[필수] 견적 상담을 위한 개인정보(성함 · 연락처 · 지역 · 사진) 수집 · 이용에 동의합니다. 상담 종료 후 1년 보관 뒤 파기합니다.</label><button type="button" data-open="modal-privacy">자세히</button></div>
+      <p class="field__err">개인정보 수집·이용에 동의해 주세요.</p>
+    </div>
+  </fieldset>
+
+  <div class="qform__nav">
+    <button class="btn btn--ghost" type="button" data-prev hidden>이전</button>
+    <button class="btn btn--primary" type="button" data-next>다음</button>
+    <button class="btn btn--primary" type="submit" data-send hidden>무료 견적 신청하기</button>
+  </div>
+</form>

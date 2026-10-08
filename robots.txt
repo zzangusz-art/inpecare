@@ -1,0 +1,39 @@
+# 인프케어 (inpe.kr)
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /order/
+Disallow: /basket/
+Disallow: /myshop/
+Disallow: /member/
+Disallow: /_build/
+Disallow: /_reel/
+
+# AI 검색·답변 엔진 (인용 노출 허용)
+User-agent: OAI-SearchBot
+Allow: /
+User-agent: ChatGPT-User
+Allow: /
+User-agent: GPTBot
+Allow: /
+User-agent: PerplexityBot
+Allow: /
+User-agent: Perplexity-User
+Allow: /
+User-agent: ClaudeBot
+Allow: /
+User-agent: Claude-User
+Allow: /
+User-agent: Claude-SearchBot
+Allow: /
+User-agent: Google-Extended
+Allow: /
+User-agent: Googlebot
+Allow: /
+User-agent: Yeti
+Allow: /
+User-agent: Bingbot
+Allow: /
+
+Sitemap: https://inpe.kr/sitemap.xml
