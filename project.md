@@ -35,6 +35,10 @@ inpe.kr을 반려견 가정 타깃 **인프케어**로 리뉴얼. 15초 쇼릴 �
 - 설정은 `assets/js/config.js` 한 곳
 
 ## 2026-10-08 — 범백 제외 + GitHub Pages 배포
+- GitHub 저장소: https://github.com/zzangusz-art/inpecare (public, main 브랜치 루트 → GitHub Pages)
+- 미리보기 주소: https://zzangusz-art.github.io/inpecare/ — github.io에서 열릴 때만 noindex 자동 부착(inpe.kr 정식 이전 시 중복 색인 방지)
+- 저장소 제외: `_research/`(기존 사이트 수집본, 노출된 슬랙 웹훅 포함), 렌더 node_modules · 폰트 · 스크린샷
+- 배포 점검: `node _dev/remote-check.js <주소>` 20/20 통과
 - 요청에 따라 범백(고양이 범백혈구감소증) 관련 문구 전부 제거: 제목 · 설명 · FAQ · 구조화 데이터 · 계산기 · 신청서 선택지 · 범백 후기 1건 · 방역 페이지 표 · 영상 6장면("파보 · 칼리시")
 
 ## 미완료 · 확인 필요 (우선순위 순)
