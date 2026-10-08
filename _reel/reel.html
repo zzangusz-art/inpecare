@@ -35,7 +35,7 @@ function rng(seed) { return function () { seed |= 0; seed = seed + 0x6D2B79F5 | 
 
 const IMG = {};
 const NAMES = ['fabric-macro', 'sofa-01', 'sofa-02', 'sofa-03', 'sofa-04', 'mattress-01', 'mattress-02', 'mattress-03',
-  'tech-sofa', 'tech-carpet', 'tech-mattress', 'mattress-before', 'mattress-after', 'dust-pad-01', 'dust-pad-03', 'dust-pad-06',
+  'mattress-before', 'mattress-after', 'dust-pad-01', 'dust-pad-03', 'dust-pad-06',
   'dust-pad-02', 'dust-pad-05', 'dust-bin-01', 'dust-bin-02', 'dust-hand', 'sofa-under-01', 'team-back'];
 
 function cover(img, dx, dy, dw, dh, zoom = 1, fx = .5, fy = .5) {
@@ -137,8 +137,8 @@ function s1(t) {
    SCENE 2 · 1.6–3.6  현장 컷 8연타
    ========================================================= */
 const CUTS = [['sofa-01', 'SOFA', '소파 · 패브릭', .5, .55], ['mattress-01', 'MATTRESS', '매트리스', .5, .5], ['sofa-03', 'SOFA', '소파 · 패브릭', .5, .6],
-['mattress-03', 'MATTRESS', '매트리스', .5, .5], ['tech-sofa', 'STEAM', '고온 스팀 클렌징', .45, .5], ['sofa-04', 'SOFA', '소파 · 패브릭', .5, .6],
-['mattress-02', 'MATTRESS', '매트리스', .5, .5], ['tech-carpet', 'CARPET', '카펫 · 러그', .6, .5]];
+['mattress-03', 'MATTRESS', '매트리스', .5, .5], ['sofa-under-01', 'SOFA', '소파 하부 · 틈새', .5, .5], ['sofa-04', 'SOFA', '소파 · 패브릭', .5, .6],
+['mattress-02', 'MATTRESS', '매트리스', .5, .5], ['dust-bin-01', 'DUST', '집진통에 모인 오염물', .5, .45]];
 function s2(t) {
   const lt = t - 1.6, i = Math.min(7, Math.floor(lt / .25)), p = cl((lt - i * .25) / .25);
   const [n, en, ko, fx, fy] = CUTS[i];
@@ -174,7 +174,6 @@ function s3(t) {
   for (let gy = 0; gy < H; gy += gs) { x.beginPath(); x.moveTo(0, gy); x.lineTo(W, gy); x.stroke(); }
   x.restore();
   const topY = PORT ? H * .27 : H * .25;
-  txt('PET ZONE', W / 2, topY - 82 * U, { size: 22 * U, w: 600, color: ORANGE, ls: 8 * U, alpha: pr(t, 3.62, 3.9) });
   reveal('반려견이 머문 자리에는', W / 2, topY, pr(t, 3.66, 4.05), { size: (PORT ? 76 : 70) * U, w: 800, max: W * .88 });
   const words = ['소변', '털', '냄새', '바이러스'], beats = [4.0, 4.24, 4.48, 4.72];
   let bw, bh, pos;
@@ -299,9 +298,9 @@ function s5(t) {
   // text
   const tx0 = PORT ? W / 2 : Math.max(SX, W * .075), al = PORT ? 'center' : 'left';
   const ty = PORT ? H * .19 : H * .40;
-  txt('PROOF  ·  현장 필터', tx0, ty - 110 * U, { size: 22 * U, w: 700, color: ORANGE, align: al, ls: 6 * U, alpha: pr(t, 8.05, 8.3) });
-  reveal('눈에 안 보이던', tx0, ty - 18 * U, pr(t, 8.08, 8.45), { size: 92 * U, w: 900, color: INK, align: al, max: PORT ? W * .9 : W * .36 });
-  reveal('것까지 꺼냅니다', tx0, ty + 88 * U, pr(t, 8.18, 8.55), { size: 92 * U, w: 900, color: INK, align: al, max: PORT ? W * .9 : W * .36 });
+  txt('현장 필터 기록', tx0, ty - 110 * U, { size: 22 * U, w: 700, color: ORANGE, align: al, ls: 6 * U, alpha: pr(t, 8.05, 8.3) });
+  reveal('겉은 깨끗해 보여도', tx0, ty - 18 * U, pr(t, 8.08, 8.45), { size: 92 * U, w: 900, color: INK, align: al, max: PORT ? W * .9 : W * .36 });
+  reveal('안에는 이만큼 있습니다', tx0, ty + 88 * U, pr(t, 8.18, 8.55), { size: 92 * U, w: 900, color: INK, align: al, max: PORT ? W * .9 : W * .36 });
   txt('소파 · 매트리스 속 먼지 · 각질 · 털', tx0, ty + 180 * U, { size: 28 * U, w: 500, color: '#55504a', align: al, alpha: pr(t, 8.45, 8.75), max: PORT ? W * .9 : W * .36 });
   txt('필터에 걸러진 실제 오염물입니다', tx0, ty + 222 * U, { size: 28 * U, w: 500, color: '#55504a', align: al, alpha: pr(t, 8.5, 8.8), max: PORT ? W * .9 : W * .36 });
   cards.forEach(([n, rot], i) => {
@@ -315,7 +314,7 @@ function s5(t) {
     x.shadowColor = 'transparent';
     const b = 14 * U;
     cover(IMG[n], -cw / 2 + b, -ch / 2 + b, cw - b * 2, ch - b * 2 - 40 * U, 1.05);
-    txt('FILTER #0' + (i + 1), -cw / 2 + b + 4 * U, ch / 2 - 26 * U, { size: 18 * U, w: 700, color: '#8a837b', align: 'left', ls: 3 * U });
+    txt('필터 0' + (i + 1), -cw / 2 + b + 4 * U, ch / 2 - 26 * U, { size: 18 * U, w: 700, color: '#8a837b', align: 'left', ls: 3 * U });
     x.restore();
   });
   x.restore();
@@ -367,17 +366,17 @@ function s6(t) {
   const pad = x.createRadialGradient(cx, cy, 0, cx, cy, (PORT ? W * .75 : W * .45));
   pad.addColorStop(0, 'rgba(10,12,16,.82)'); pad.addColorStop(1, 'rgba(10,12,16,0)');
   x.fillStyle = pad; x.fillRect(0, 0, W, H);
-  txt('PET VIRUS CONTROL', cx, cy - (PORT ? 190 : 170) * U, { size: 22 * U, w: 700, color: ORANGE, ls: 8 * U, alpha: pr(t, 10.15, 10.4) });
-  reveal('파보 · 칼리시', cx, cy - 40 * U, pr(t, 10.2, 10.6), { size: 136 * U, w: 900, max: W * .88, ls: -2 * U });
-  reveal('감염 이후, 생활 공간 방역까지', cx, cy + 84 * U, pr(t, 10.55, 10.9), { size: 46 * U, w: 600, color: '#dde2ea', max: W * .88 });
-  txt('환경부 승인 항바이러스 성능 인증 제품 사용', cx, cy + 172 * U, { size: 25 * U, w: 600, color: ORANGE, ls: 2 * U, alpha: pr(t, 10.95, 11.25), max: W * .88 });
+  if (!window.NOTEXT) txt('반려동물 바이러스 방역', cx, cy - (PORT ? 190 : 170) * U, { size: 22 * U, w: 700, color: ORANGE, ls: 8 * U, alpha: pr(t, 10.15, 10.4) });
+  if (!window.NOTEXT) reveal('파보 · 칼리시', cx, cy - 40 * U, pr(t, 10.2, 10.6), { size: 136 * U, w: 900, max: W * .88, ls: -2 * U });
+  if (!window.NOTEXT) reveal('감염 뒤, 집 안 방역', cx, cy + 84 * U, pr(t, 10.55, 10.9), { size: 46 * U, w: 600, color: '#dde2ea', max: W * .88 });
+  if (!window.NOTEXT) txt('환경부 승인 항바이러스 성능 인증 제품 사용', cx, cy + 172 * U, { size: 25 * U, w: 600, color: ORANGE, ls: 2 * U, alpha: pr(t, 10.95, 11.25), max: W * .88 });
   flash(t, 11.93, .1, '#fff', .6);
 }
 
 /* =========================================================
    SCENE 7 · 12.0–13.6  모자이크 + 숫자
    ========================================================= */
-const MOS = ['sofa-01', 'dust-pad-02', 'mattress-02', 'tech-mattress', 'sofa-03', 'dust-bin-01', 'mattress-03', 'sofa-under-01', 'dust-pad-05', 'sofa-04', 'mattress-01', 'dust-hand', 'sofa-02', 'dust-bin-02', 'tech-sofa'];
+const MOS = ['sofa-01', 'dust-pad-02', 'mattress-02', 'fabric-macro', 'sofa-03', 'dust-bin-01', 'mattress-03', 'sofa-under-01', 'dust-pad-05', 'sofa-04', 'mattress-01', 'dust-hand', 'sofa-02', 'dust-bin-02', 'dust-pad-03'];
 const ORDER = (() => { const r = rng(9), a = MOS.map((_, i) => i); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; })();
 function s7(t) {
   x.fillStyle = INK; x.fillRect(0, 0, W, H);
@@ -416,8 +415,8 @@ function s8(t) {
     vgrad(H * .35, H, 0, .85);
     const op = eOut(pr(t, 13.6, 13.75)); if (op < 1) { x.fillStyle = INK; x.fillRect(0, 0, W, H / 2 * (1 - op)); x.fillRect(0, H - H / 2 * (1 - op), W, H / 2 * (1 - op)); }
     const lx = PORT ? W / 2 : SX, al = PORT ? 'center' : 'left';
-    txt('INPE CARE FIELD TEAM', lx, H - (PORT ? 330 : 250) * U, { size: 22 * U, w: 700, color: ORANGE, align: al, ls: 6 * U, alpha: pr(t, 13.72, 13.95) });
-    reveal('사람이 직접, 끝까지.', lx, H - (PORT ? 230 : 160) * U, pr(t, 13.78, 14.1), { size: (PORT ? 104 : 116) * U, w: 900, align: al, max: W * .9 });
+    txt('인프케어 현장팀', lx, H - (PORT ? 330 : 250) * U, { size: 22 * U, w: 700, color: ORANGE, align: al, ls: 6 * U, alpha: pr(t, 13.72, 13.95) });
+    reveal('교육 수료 전문가가 직접 갑니다', lx, H - (PORT ? 230 : 160) * U, pr(t, 13.78, 14.1), { size: (PORT ? 104 : 116) * U, w: 900, align: al, max: W * .9 });
   }
   // wipes
   const w1 = eIO(pr(t, 14.18, 14.42)), w2 = eIO(pr(t, 14.28, 14.52));
@@ -448,14 +447,15 @@ function endCard(t) {
 }
 
 /* ---------- HUD ---------- */
-const LABELS = [[0, '01  OPEN'], [1.6, '02  FIELD'], [3.6, '03  PET ZONE'], [5.6, '04  UV CARE'], [8, '05  PROOF'], [10, '06  VIRUS'], [12, '07  DATA'], [13.6, '08  TEAM']];
+const LABELS = [[0, '01  누적 시공'], [1.6, '02  현장'], [3.6, '03  반려견 생활 공간'], [5.6, '04  UV 케어'], [8, '05  필터 기록'], [10, '06  바이러스 방역'], [12, '07  숫자로 보는 인프케어'], [13.6, '08  현장팀']];
 function hud(t, light) {
+  if (window.NOTEXT) return;
   const a = 1 - pr(t, 14.3, 14.5);
   if (a <= 0) return;
   const col = light ? 'rgba(11,11,11,.6)' : 'rgba(255,255,255,.62)';
   const m = SX, mt = SY + 8 * U;
   x.save(); x.globalAlpha = a;
-  txt('INPE CARE — FIELD REEL 2026', m, mt, { size: 17 * U, w: 600, color: col, align: 'left', ls: 3.5 * U });
+  txt('인프케어 현장 기록 2026', m, mt, { size: 17 * U, w: 600, color: col, align: 'left', ls: 3.5 * U });
   const f = Math.min(449, Math.round(t * FPS)), sec = Math.floor(f / FPS), ff = f % FPS;
   const tc = `00:00:${String(sec).padStart(2, '0')}:${String(ff).padStart(2, '0')}`;
   txt(tc, W - m, mt, { size: 17 * U, w: 600, color: col, align: 'right', ls: 3 * U });
@@ -468,7 +468,7 @@ function hud(t, light) {
   x.fillStyle = ORANGE; x.fillRect(m, py, (W - m * 2) * (t / DUR), 2 * U);
   let lab = LABELS[0][1]; LABELS.forEach(([s, l]) => { if (t >= s) lab = l; });
   txt(lab, m, py - 20 * U, { size: 15 * U, w: 700, color: col, align: 'left', ls: 3 * U });
-  txt('INCHEON · SEOUL · GYEONGGI', W - m, py - 20 * U, { size: 15 * U, w: 600, color: col, align: 'right', ls: 3 * U });
+  txt('인천 · 서울 · 경기', W - m, py - 20 * U, { size: 15 * U, w: 600, color: col, align: 'right', ls: 3 * U });
   x.restore();
 }
 

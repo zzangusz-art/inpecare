@@ -27,6 +27,7 @@ const server = http.createServer((req, res) => {
   page.on('console', m => console.log('PAGE', m.text()));
   await page.goto(`http://127.0.0.1:${port}/_reel/reel.html?w=${W}&h=${H}`);
   await page.waitForFunction('window.READY === true', { timeout: 90000 });
+  if (process.env.NOTEXT) await page.evaluate(() => { window.NOTEXT = true; });
 
   const grab = async t => {
     const d = await page.evaluate(t => { window.render(t); return document.getElementById('c').toDataURL('image/jpeg', 0.93); }, t);

@@ -10,7 +10,7 @@
   var DEMO = location.protocol === 'file:' || /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
   var won = function (n) { return n.toLocaleString('ko-KR') + '원'; };
   var clamp = function (v, a, b) { return Math.max(a, Math.min(b, v)); };
-  /* rAF가 멈추는 환경(숨겨진 탭 · 일부 인앱 브라우저)에서도 스크롤 연출이 갱신되도록 폴백 */
+  /* rAF가 멈추는 환경(숨겨진 탭·일부 인앱 브라우저)에서도 스크롤 연출이 갱신되도록 폴백 */
   var raf = function (cb) { var ran = false, id = requestAnimationFrame(function () { ran = true; cb(); }); setTimeout(function () { if (!ran) { cancelAnimationFrame(id); cb(); } }, 120); };
   document.documentElement.classList.remove('no-js');
 
@@ -159,7 +159,7 @@
   window.inpeOverlay = Overlay;
 
   /* =======================================================
-     헤더 · 진행바 · 퀵메뉴
+     헤더·진행바·퀵메뉴
      ======================================================= */
   function initChrome() {
     var hdr = $('.hdr'), bar = $('.progress-top'), quick = $('.quick'), mbar = $('.mbar'), reel = $('.reel');
@@ -259,7 +259,7 @@
   }
 
   /* =======================================================
-     리빌 · 카운터
+     리빌·카운터
      ======================================================= */
   function initReveal() {
     var els = $$('.rv, .img-rv');
@@ -280,7 +280,7 @@
   }
 
   /* =======================================================
-     탭 · 아코디언
+     탭·아코디언
      ======================================================= */
   function initTabs() {
     $$('[data-tabs]').forEach(function (w) {
@@ -319,7 +319,7 @@
   }
 
   /* =======================================================
-     비포/애프터 · 필터 카드 · 라이트박스 · 이미지 스켈레톤
+     비포/애프터·필터 카드·라이트박스·이미지 스켈레톤
      ======================================================= */
   function initBA() {
     $$('.ba').forEach(function (ba) {
@@ -372,7 +372,7 @@
     var cv = $('.seq__canvas', S), ctx = cv.getContext('2d'), steps = $$('.seq__step', S), barEl = $('.seq__bar', S);
     var srcs = { before: 'assets/img/real/mattress-before.jpg', after: 'assets/img/real/mattress-after.jpg', under: 'assets/img/real/sofa-under-02.jpg', dust: 'assets/img/real/dust-bin-01.jpg' };
     var IM = {}, left = 0, W = 0, H = 0, dpr = Math.min(2, window.devicePixelRatio || 1);
-    var NAMES = ['UV-C 살균', '건식 흡입', '습식 세정', '고온 스팀', '하부 · 틈새', '음이온 마감'];
+    var NAMES = ['UV-C 살균', '건식 흡입', '습식 세정', '고온 스팀', '하부·틈새', '음이온 마감'];
     Object.keys(srcs).forEach(function (k) { left++; var im = new Image(); im.onload = function () { if (--left === 0) draw(); }; im.src = srcs[k]; IM[k] = im; });
     function size() { var r = cv.getBoundingClientRect(); W = Math.round(r.width * dpr); H = Math.round(r.height * dpr); cv.width = W; cv.height = H; draw(); }
     function cover(im, x, y, w, h, z) { if (!im || !im.naturalWidth) return; z = z || 1; var ir = im.naturalWidth / im.naturalHeight, rr = w / h, sw, sh; if (ir > rr) { sh = im.naturalHeight; sw = sh * rr; } else { sw = im.naturalWidth; sh = sw / rr; } sw /= z; sh /= z; ctx.drawImage(im, (im.naturalWidth - sw) / 2, (im.naturalHeight - sh) / 2, sw, sh, x, y, w, h); }
@@ -427,7 +427,7 @@
       ctx.fillStyle = 'rgba(0,0,0,.55)'; ctx.fillRect(0, H - 54 * u, W, 54 * u);
       ctx.fillStyle = '#FF5A00'; ctx.fillRect(0, H - 4 * u, W * p, 4 * u);
       ctx.font = '700 ' + (20 * u) + 'px "Noto Sans KR"'; ctx.textBaseline = 'middle'; ctx.textAlign = 'left'; ctx.fillStyle = '#fff';
-      ctx.fillText('STEP 0' + (st + 1) + '  ·  ' + NAMES[st], 22 * u, H - 28 * u);
+      ctx.fillText((st + 1) + '단계  ' + NAMES[st], 22 * u, H - 28 * u);
       ctx.textAlign = 'right'; ctx.fillStyle = 'rgba(255,255,255,.7)'; ctx.fillText(Math.round(p * 100) + '%', W - 22 * u, H - 28 * u);
       steps.forEach(function (el, k) { el.classList.toggle('is-on', k <= st); el.classList.toggle('is-cur', k === st); });
       if (barEl) barEl.style.setProperty('--p', p.toFixed(3));
@@ -458,7 +458,7 @@
       var method = val('method'), wet = method === 'wet', lines = [], total = 0, items = [];
       if (on('pet_urine') && !wet) {
         F.querySelector('[name="method"][value="wet"]').checked = true; wet = true; method = 'wet';
-        if (ev && ev.target && ev.target.name === 'pet_urine' && !warned) { warned = true; toast('소변 · 배변 오염은 요산이 섬유 안쪽까지 스며들어 건식으로는 냄새가 남습니다. <b>습건식 + 스팀</b>으로 자동 변경했습니다.', { title: '케어 방식 변경', type: 'info', timeout: 6500 }); }
+        if (ev && ev.target && ev.target.name === 'pet_urine' && !warned) { warned = true; toast('소변·배변 오염은 요산이 섬유 안쪽까지 스며들어 건식으로는 냄새가 남습니다. <b>습건식 + 스팀</b>으로 자동 변경했습니다.', { title: '케어 방식 변경', type: 'info', timeout: 6500 }); }
       }
       out.hint.hidden = !(on('pet_urine') || on('pet_virus'));
       var mm = on('use_mattress') && PRICE.mattress[F.mattress_size.value], ss = on('use_sofa') && PRICE.sofa[F.sofa_size.value];
@@ -485,7 +485,7 @@
   }
 
   /* =======================================================
-     상담 신청 폼 (스텝 · 검증 · 사진 압축 · 전송 · 아웃박스)
+     상담 신청 폼 (스텝·검증·사진 압축·전송·아웃박스)
      ======================================================= */
   var Form = {
     prefill: function (root, c) {
@@ -661,15 +661,15 @@
   }
 
   /* =======================================================
-     실시간 접수 현황 (시트의 실제 접수만 · 마스킹)
+     실시간 접수 현황 (시트의 실제 접수만·마스킹)
      ======================================================= */
   var DEMO_ROWS = [
-    { t: '방금', name: '김○○', area: '서울 강남', svc: '매트리스 소변 얼룩 · 습건식+스팀', st: '진행 중' },
-    { t: '12분 전', name: '이○○', area: '인천 연수', svc: '소파 4인 카우치 · 반려견 털·냄새', st: '접수' },
+    { t: '방금', name: '김○○', area: '서울 강남', svc: '매트리스 소변 얼룩·습건식+스팀', st: '진행 중' },
+    { t: '12분 전', name: '이○○', area: '인천 연수', svc: '소파 4인 카우치·반려견 털·냄새', st: '접수' },
     { t: '38분 전', name: '박○○', area: '경기 부천', svc: '파보 회복 후 집 전체 방역', st: '완료' },
-    { t: '1시간 전', name: '최○○', area: '서울 마포', svc: '고양이 소변 · 퀸 매트리스', st: '진행 중' },
+    { t: '1시간 전', name: '최○○', area: '서울 마포', svc: '고양이 소변·퀸 매트리스', st: '진행 중' },
     { t: '2시간 전', name: '정○○', area: '경기 김포', svc: '칼리시 방역 + 소파 3인', st: '접수' },
-    { t: '3시간 전', name: '강○○', area: '인천 남동', svc: '매트리스 2개 · 건식', st: '완료' }
+    { t: '3시간 전', name: '강○○', area: '인천 남동', svc: '매트리스 2개·건식', st: '완료' }
   ];
   function stClass(s) { return /완료/.test(s) ? 'st--done' : /진행|출동|방문/.test(s) ? 'st--ing' : ''; }
   function initBoard() {
@@ -702,7 +702,7 @@
   }
 
   /* =======================================================
-     리뷰 필터 · 더보기
+     리뷰 필터·더보기
      ======================================================= */
   function initReviews() {
     var w = $('#review-list'); if (!w) return;
@@ -719,7 +719,7 @@
   }
 
   /* =======================================================
-     기타: 복사 · 전화/문자 추적 · TOC
+     기타: 복사·전화/문자 추적·TOC
      ======================================================= */
   function copyText(t, msg) {
     var ok = function () { toast(msg || '복사했습니다.', { type: 'ok', timeout: 2400 }); };

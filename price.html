@@ -32,7 +32,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css?v=202610081146">
+<link rel="stylesheet" href="assets/css/style.css?v=202610081228">
 
 <script type="application/ld+json">
 {
@@ -59,6 +59,7 @@
     "@type": "Person",
     "name": "이은수"
    },
+   "disambiguatingDescription": "인프케어(INPE CARE)는 주식회사 인프의 반려동물 홈케어·방역 서비스 브랜드이며, 성격유형 MBTI의 INFP(인프)와는 관련이 없습니다.",
    "sameAs": [
     "https://blog.naver.com/apso11"
    ],
@@ -84,6 +85,7 @@
     "INPE CARE",
     "인프 홈케어"
    ],
+   "disambiguatingDescription": "성격유형 MBTI의 INFP(인프)가 아닌, 주식회사 인프의 반려동물 청소·방역 서비스입니다.",
    "description": "인프케어는 주식회사 인프가 운영하는 반려동물 가정 전문 소파·매트리스 청소와 바이러스 방역 서비스입니다. 강아지·고양이 소변 얼룩과 냄새 제거, 털·진드기 관리, 파보·칼리시 감염 후 생활 공간 방역을 제공합니다.",
    "url": "https://inpe.kr/",
    "image": [
@@ -400,19 +402,18 @@
   <div class="page-hero__bg"><img src="assets/img/real/sofa-04.jpg" alt=""></div>
   <div class="wrap">
     <ol class="crumbs" aria-label="현재 위치"><li><a href="index.html">홈</a></li><li>가격표</li></ol>
-    <span class="eyebrow">PRICE LIST</span>
-    <h1>소파 · 매트리스 청소 가격,<br>사이즈별로 전부 공개합니다</h1>
-    <p>매트리스 청소 2만원부터, 소파 청소 2만원부터. 반려동물 소변 오염은 습건식 + 스팀 가격이 적용되며, 서울 · 인천 · 경기 출장비는 무료입니다.</p>
+    <h1>소파·매트리스 청소 가격표</h1>
+    <p>매트리스 청소 2만원부터, 소파 청소 2만원부터. 반려동물 소변 오염은 습건식 + 스팀 가격이 적용되며, 서울·인천·경기 출장비는 무료입니다.</p>
   </div>
 </section>
 
 <section class="sec" id="calculator">
   <div class="wrap">
-    <div class="sec-head"><span class="eyebrow">CALCULATOR</span><h2 class="h-1">내 상황으로 계산하기</h2></div>
+    <div class="sec-head"><span class="eyebrow">견적 계산</span><h2 class="h-1">내 상황으로 계산하기</h2></div>
     <div class="calc">
-  <form class="calc__panel" id="calc" onsubmit="return false" aria-label="소파 · 매트리스 청소 견적 계산기">
+  <form class="calc__panel" id="calc" onsubmit="return false" aria-label="소파·매트리스 청소 견적 계산기">
     <div class="calc__group">
-      <label class="toggle"><input type="checkbox" name="use_mattress" checked><span class="toggle__txt">매트리스<small>UV 살균 · 고성능 흡입 · 얼룩 제거 · 탈취 포함</small></span><span class="toggle__sw" aria-hidden="true"></span></label>
+      <label class="toggle"><input type="checkbox" name="use_mattress" checked><span class="toggle__txt">매트리스<small>UV 살균·고성능 흡입·얼룩 제거·탈취 포함</small></span><span class="toggle__sw" aria-hidden="true"></span></label>
       <div class="row2">
         <select class="select" name="mattress_size" aria-label="매트리스 사이즈">
           <option value="baby">유아용</option><option value="single">싱글</option><option value="ss">슈퍼싱글</option><option value="queen" selected>퀸</option><option value="king">킹</option><option value="lking">라지킹</option><option value="family">패밀리 (싱글+퀸)</option>
@@ -421,7 +422,7 @@
       </div>
     </div>
     <div class="calc__group">
-      <label class="toggle"><input type="checkbox" name="use_sofa"><span class="toggle__txt">소파<small>패브릭 소재 기준 · 카우치형은 1만원 추가</small></span><span class="toggle__sw" aria-hidden="true"></span></label>
+      <label class="toggle"><input type="checkbox" name="use_sofa"><span class="toggle__txt">소파<small>패브릭 소재 기준·카우치형은 1만원 추가</small></span><span class="toggle__sw" aria-hidden="true"></span></label>
       <select class="select" name="sofa_size" aria-label="소파 크기" disabled>
         <option value="s1">1인용</option><option value="s2">2인용</option><option value="s3" selected>3인용</option><option value="s4">4인용</option><option value="s4c">4인용 카우치</option><option value="s5">5인용</option><option value="s5c">5인용 카우치</option><option value="s6">6인용</option><option value="s6c">6인용 카우치</option>
       </select>
@@ -429,24 +430,24 @@
     <div class="calc__group">
       <span class="calc__label">케어 방식 <small>반려동물 오염은 습건식 + 스팀 권장</small></span>
       <div class="seg">
-        <input type="radio" name="method" id="cm-dry" value="dry"><label for="cm-dry">건식 · 바로 사용</label>
-        <input type="radio" name="method" id="cm-wet" value="wet" checked><label for="cm-wet">습건식 + 스팀 · 3~5시간 건조</label>
+        <input type="radio" name="method" id="cm-dry" value="dry"><label for="cm-dry">건식 (바로 사용)</label>
+        <input type="radio" name="method" id="cm-wet" value="wet" checked><label for="cm-wet">습건식 + 스팀 (3~5시간 건조)</label>
       </div>
     </div>
     <div class="calc__group">
       <span class="calc__label">반려동물 상황</span>
-      <label class="toggle"><input type="checkbox" name="pet_urine"><span class="toggle__txt">소변 · 배변 · 구토 오염이 있어요<small>요산 결정까지 분해하는 습건식 + 스팀으로 진행</small></span><span class="toggle__sw" aria-hidden="true"></span></label>
-      <label class="toggle"><input type="checkbox" name="pet_hair"><span class="toggle__txt">털 · 비듬 · 체취가 신경 쓰여요<small>고성능 흡입 + 음이온 탈취 마감 (추가 비용 없음)</small></span><span class="toggle__sw" aria-hidden="true"></span></label>
-      <label class="toggle"><input type="checkbox" name="pet_virus"><span class="toggle__txt">파보 · 칼리시 감염 이력이 있어요<small>반려동물 바이러스 방역 149,000원~ (10평 기준, 평형별 차등)</small></span><span class="toggle__sw" aria-hidden="true"></span></label>
+      <label class="toggle"><input type="checkbox" name="pet_urine"><span class="toggle__txt">소변·배변·구토 오염이 있어요<small>습건식 + 스팀으로 진행합니다</small></span><span class="toggle__sw" aria-hidden="true"></span></label>
+      <label class="toggle"><input type="checkbox" name="pet_hair"><span class="toggle__txt">털·비듬·체취가 신경 쓰여요<small>고성능 흡입 + 음이온 탈취 마감 (추가 비용 없음)</small></span><span class="toggle__sw" aria-hidden="true"></span></label>
+      <label class="toggle"><input type="checkbox" name="pet_virus"><span class="toggle__txt">파보·칼리시 감염 이력이 있어요<small>반려동물 바이러스 방역 149,000원~ (10평 기준, 평형별 차등)</small></span><span class="toggle__sw" aria-hidden="true"></span></label>
     </div>
   </form>
   <aside class="calc__result" aria-live="polite">
     <span class="eyebrow">예상 금액</span>
     <p class="calc__total"><b class="num" id="calc-total">0</b><span>원</span></p>
     <ul class="calc__lines" id="calc-lines"></ul>
-    <p class="calc__hint" id="calc-hint" hidden><svg class="ico"><use href="#i-paw"/></svg><span>반려동물 오염은 상태에 따라 공정이 달라질 수 있어 사진을 함께 보내주시면 방문 전에 금액을 확정해 드립니다.</span></p>
+    <p class="calc__hint" id="calc-hint" hidden><svg class="ico"><use href="#i-paw"/></svg><span>오염 상태에 따라 공정이 달라질 수 있습니다. 신청할 때 사진을 함께 올려주세요.</span></p>
     <button class="btn btn--primary btn--lg btn--block" type="button" id="calc-go">이 견적으로 상담 신청</button>
-    <p class="calc__note">인프케어 공개 가격표 기준 금액입니다. 오염 정도 · 소재 · 현장 여건에 따라 달라질 수 있으며, 최종 금액은 방문 전 안내드립니다.</p>
+    <p class="calc__note">인프케어 공개 가격표 기준 금액입니다. 오염 정도·소재·현장 여건에 따라 달라질 수 있으며, 최종 금액은 방문 전 안내드립니다.</p>
   </aside>
 </div>
 
@@ -455,7 +456,7 @@
 
 <section class="sec sec--white" id="tables">
   <div class="wrap">
-    <div class="sec-head"><span class="eyebrow">TABLE</span><h2 class="h-1">전체 가격표</h2><p class="lead">UV 살균 · 고성능 흡입 · 얼룩 제거 · 탈취 공정이 포함된 금액입니다.</p></div>
+    <div class="sec-head"><h2 class="h-1">전체 가격표</h2><p class="lead">UV 살균·고성능 흡입·얼룩 제거·탈취 공정이 포함된 금액입니다.</p></div>
     <div class="tables">
       <table class="ptable">
         <caption>매트리스 청소</caption>
@@ -488,18 +489,18 @@
       </table>
     </div>
     <div class="cards" style="margin-top:20px;grid-template-columns:1fr 1fr">
-      <div class="card"><h3>건식</h3><p>UV 살균과 고성능 흡입으로 진드기 · 먼지 · 각질을 제거합니다. 시공 직후 바로 사용할 수 있습니다.</p></div>
-      <div class="card"><h3>습건식 + 스팀</h3><p>건식 공정에 물세척과 고온 스팀 살균을 더합니다. 얼룩 · 냄새 · 반려동물 오염에 효과적이며 3~5시간 건조 후 사용을 권장합니다.</p></div>
+      <div class="card"><h3>건식</h3><p>UV 살균과 고성능 흡입으로 진드기·먼지·각질을 제거합니다. 시공 직후 바로 사용할 수 있습니다.</p></div>
+      <div class="card"><h3>습건식 + 스팀</h3><p>건식 공정에 물세척과 고온 스팀 살균을 더합니다. 얼룩·냄새·반려동물 오염에 효과적이며 3~5시간 건조 후 사용을 권장합니다.</p></div>
     </div>
-    <p class="note" style="margin-top:20px"><svg class="ico"><use href="#i-paw"/></svg><span>반려동물 배변 · 소변 · 구토 오염은 습건식 + 스팀 방식을 권장합니다. 카우치형은 같은 인용수 대비 1만원이 추가됩니다.</span></p>
+    <p class="note" style="margin-top:20px"><svg class="ico"><use href="#i-paw"/></svg><span>반려동물 배변·소변·구토 오염은 습건식 + 스팀 방식을 권장합니다. 카우치형은 같은 인용수 대비 1만원이 추가됩니다.</span></p>
   </div>
 </section>
 
 <section class="sec" id="other">
   <div class="wrap">
-    <div class="sec-head"><span class="eyebrow">OTHER SERVICES</span><h2 class="h-1">방역 · 기타 서비스</h2><p class="lead">패브릭 청소와 함께 신청하시면 방문 1회로 처리해 드립니다.</p></div>
+    <div class="sec-head"><h2 class="h-1">방역·기타 서비스</h2><p class="lead">패브릭 청소와 함께 신청하시면 방문 1회로 처리해 드립니다.</p></div>
     <div class="cards" style="grid-template-columns:repeat(4,1fr)">
-      <div class="card"><h3>소독 · 방역</h3><p><b class="accent" style="font-size:22px">149,000원~</b><br>10평형 기준 · 평형별 차등<br>UV 케어 · 살충제 시공 옵션</p></div>
+      <div class="card"><h3>소독·방역</h3><p><b class="accent" style="font-size:22px">149,000원~</b><br>10평형 기준·평형별 차등<br>UV 케어·살충제 시공 옵션</p></div>
       <div class="card"><h3>월 정기 방역</h3><p><b class="accent" style="font-size:22px">99,000원</b><br>정기 방문 관리<br>시공 완료 인증서 발급</p></div>
       <div class="card"><h3>AI 견적 표준형</h3><p><b class="accent" style="font-size:22px">29,900원</b><br>AI 공간 분석 기반<br>인테리어 견적 산출</p></div>
       <div class="card"><h3>AI 견적 프리미엄형</h3><p><b class="accent" style="font-size:22px">99,000원</b><br>정밀 공간 분석<br>전문가 최종 검수 포함</p></div>
@@ -509,15 +510,15 @@
 
 <section class="sec sec--white" id="area">
   <div class="wrap area">
-    <div><span class="eyebrow">AREA</span><h2 class="h-1" style="margin:16px 0 18px">출장비는<br>수도권 전역 무료</h2><p class="lead">인천 남동구 본사를 기점으로 수도권 전역에 출장 서비스를 제공합니다. 도서 · 산간 지역은 별도 문의가 필요합니다.</p></div>
+    <div><span class="eyebrow">서비스 지역</span><h2 class="h-1" style="margin:16px 0 18px">출장비는<br>수도권 전역 무료</h2><p class="lead">인천 남동구 본사를 기점으로 수도권 전역에 출장 서비스를 제공합니다. 도서·산간 지역은 별도 문의가 필요합니다.</p></div>
     <table class="ptable">
       <caption>권역별 서비스 지역</caption>
       <thead><tr><th>권역</th><th style="text-align:left">서비스 지역</th><th>출장비</th></tr></thead>
       <tbody>
-        <tr><td>인천</td><td style="text-align:left">남동구 · 연수구 · 미추홀구 · 부평구 · 서구 · 계양구 · 중구 · 동구</td><td class="hl">무료</td></tr>
-        <tr><td>경기 서부</td><td style="text-align:left">부천 · 김포 · 시흥 · 광명 · 안산</td><td class="hl">무료</td></tr>
+        <tr><td>인천</td><td style="text-align:left">남동구·연수구·미추홀구·부평구·서구·계양구·중구·동구</td><td class="hl">무료</td></tr>
+        <tr><td>경기 서부</td><td style="text-align:left">부천·김포·시흥·광명·안산</td><td class="hl">무료</td></tr>
         <tr><td>서울</td><td style="text-align:left">서울시 전 지역</td><td class="hl">무료</td></tr>
-        <tr><td>경기 남부 · 북부</td><td style="text-align:left">수원 · 성남 · 용인 · 고양 · 의정부 등</td><td class="hl">무료</td></tr>
+        <tr><td>경기 남부·북부</td><td style="text-align:left">수원·성남·용인·고양·의정부 등</td><td class="hl">무료</td></tr>
       </tbody>
     </table>
   </div>
@@ -525,13 +526,13 @@
 
 <section class="sec" id="faq">
   <div class="wrap" style="max-width:980px">
-    <div class="sec-head"><span class="eyebrow">FAQ</span><h2 class="h-1">가격 · 시공 질문</h2></div>
-    <div class="acc" data-single><div class="acc__item"><button class="acc__btn" type="button" aria-expanded="true"><span><span class="q">Q</span>매트리스 청소 비용은 얼마인가요?</span><span class="acc__icon" aria-hidden="true"></span></button><div class="acc__panel"><div><div class="acc__body"><p>사이즈와 케어 방식에 따라 다릅니다. 건식은 유아용 2만원, 싱글 · 슈퍼싱글 3만원, 퀸 4만원, 킹 5만원, 라지킹 6만원, 패밀리(싱글+퀸) 9만원입니다. 습건식 + 스팀은 유아용 5만원, 싱글 6만원, 슈퍼싱글 7만원, 퀸 8만원, 킹 9만원, 라지킹 10만원, 패밀리 13만원입니다.</p></div></div></div></div>
+    <div class="sec-head"><h2 class="h-1">가격·시공 질문</h2></div>
+    <div class="acc" data-single><div class="acc__item"><button class="acc__btn" type="button" aria-expanded="true"><span><span class="q">Q</span>매트리스 청소 비용은 얼마인가요?</span><span class="acc__icon" aria-hidden="true"></span></button><div class="acc__panel"><div><div class="acc__body"><p>사이즈와 케어 방식에 따라 다릅니다. 건식은 유아용 2만원, 싱글·슈퍼싱글 3만원, 퀸 4만원, 킹 5만원, 라지킹 6만원, 패밀리(싱글+퀸) 9만원입니다. 습건식 + 스팀은 유아용 5만원, 싱글 6만원, 슈퍼싱글 7만원, 퀸 8만원, 킹 9만원, 라지킹 10만원, 패밀리 13만원입니다.</p></div></div></div></div>
 <div class="acc__item"><button class="acc__btn" type="button" aria-expanded="false"><span><span class="q">Q</span>소파 청소 비용은 얼마인가요?</span><span class="acc__icon" aria-hidden="true"></span></button><div class="acc__panel"><div><div class="acc__body"><p>인용수와 케어 방식에 따라 다릅니다. 건식은 1인용 2만원, 2인용 3만원, 3인용 4만원, 4인용 5만원, 5인용 6만원, 6인용 7만원입니다. 습건식 + 스팀은 1인용 4만원, 2인용 7만원, 3인용 8만원, 4인용 9만원, 5인용 11만원, 6인용 13만원이며 카우치형은 1만원이 추가됩니다. 7인용 이상은 전화로 안내드립니다.</p></div></div></div></div>
-<div class="acc__item"><button class="acc__btn" type="button" aria-expanded="false"><span><span class="q">Q</span>건식과 습건식 + 스팀은 무엇이 다른가요?</span><span class="acc__icon" aria-hidden="true"></span></button><div class="acc__panel"><div><div class="acc__body"><p>건식은 UV 살균과 고성능 흡입으로 진드기 · 먼지 · 각질을 제거하는 방식으로 시공 직후 바로 사용할 수 있습니다. 습건식 + 스팀은 건식 공정에 물세척과 고온 스팀 살균을 더한 방식으로, 얼룩 · 냄새 · 반려동물 오염 제거에 효과적이며 3~5시간 건조 후 사용을 권장합니다.</p></div></div></div></div>
-<div class="acc__item"><button class="acc__btn" type="button" aria-expanded="false"><span><span class="q">Q</span>반려동물 배변 오염도 처리할 수 있나요?</span><span class="acc__icon" aria-hidden="true"></span></button><div class="acc__panel"><div><div class="acc__body"><p>가능합니다. 반려동물 배변 · 구토 · 소변 오염은 습건식 + 스팀 방식으로 처리하며 고온 스팀 살균과 전문 탈취 공정을 함께 진행합니다. 파보 · 칼리시 등 감염병 이후 환경 방역도 함께 신청하실 수 있습니다.</p></div></div></div></div>
-<div class="acc__item"><button class="acc__btn" type="button" aria-expanded="false"><span><span class="q">Q</span>서비스 가능 지역은 어디인가요?</span><span class="acc__icon" aria-hidden="true"></span></button><div class="acc__panel"><div><div class="acc__body"><p>인천 남동구 본사를 기점으로 인천 전 지역, 서울 전 지역, 경기 부천 · 김포 · 시흥 · 광명 · 안산 · 수원 · 성남 · 용인 · 고양 · 의정부 등 수도권 전역에 방문합니다.</p></div></div></div></div>
-<div class="acc__item"><button class="acc__btn" type="button" aria-expanded="false"><span><span class="q">Q</span>출장비가 따로 있나요?</span><span class="acc__icon" aria-hidden="true"></span></button><div class="acc__panel"><div><div class="acc__body"><p>수도권(서울 · 인천 · 경기)은 출장비가 무료입니다. 도서 · 산간 지역은 별도 문의가 필요합니다.</p></div></div></div></div>
+<div class="acc__item"><button class="acc__btn" type="button" aria-expanded="false"><span><span class="q">Q</span>건식과 습건식 + 스팀은 무엇이 다른가요?</span><span class="acc__icon" aria-hidden="true"></span></button><div class="acc__panel"><div><div class="acc__body"><p>건식은 UV 살균과 고성능 흡입으로 진드기·먼지·각질을 제거하는 방식으로 시공 직후 바로 사용할 수 있습니다. 습건식 + 스팀은 건식 공정에 물세척과 고온 스팀 살균을 더한 방식으로, 얼룩·냄새·반려동물 오염 제거에 효과적이며 3~5시간 건조 후 사용을 권장합니다.</p></div></div></div></div>
+<div class="acc__item"><button class="acc__btn" type="button" aria-expanded="false"><span><span class="q">Q</span>반려동물 배변 오염도 처리할 수 있나요?</span><span class="acc__icon" aria-hidden="true"></span></button><div class="acc__panel"><div><div class="acc__body"><p>가능합니다. 반려동물 배변·구토·소변 오염은 습건식 + 스팀 방식으로 처리하며 고온 스팀 살균과 전문 탈취 공정을 함께 진행합니다. 파보·칼리시 등 감염병 이후 환경 방역도 함께 신청하실 수 있습니다.</p></div></div></div></div>
+<div class="acc__item"><button class="acc__btn" type="button" aria-expanded="false"><span><span class="q">Q</span>서비스 가능 지역은 어디인가요?</span><span class="acc__icon" aria-hidden="true"></span></button><div class="acc__panel"><div><div class="acc__body"><p>인천 남동구 본사를 기점으로 인천 전 지역, 서울 전 지역, 경기 부천·김포·시흥·광명·안산·수원·성남·용인·고양·의정부 등 수도권 전역에 방문합니다.</p></div></div></div></div>
+<div class="acc__item"><button class="acc__btn" type="button" aria-expanded="false"><span><span class="q">Q</span>출장비가 따로 있나요?</span><span class="acc__icon" aria-hidden="true"></span></button><div class="acc__panel"><div><div class="acc__body"><p>수도권(서울·인천·경기)은 출장비가 무료입니다. 도서·산간 지역은 별도 문의가 필요합니다.</p></div></div></div></div>
 <div class="acc__item"><button class="acc__btn" type="button" aria-expanded="false"><span><span class="q">Q</span>어떤 사이즈인지 헷갈리면 어떻게 하나요?</span><span class="acc__icon" aria-hidden="true"></span></button><div class="acc__panel"><div><div class="acc__body"><p>사진과 오염 상태를 보내주시면 방문 전에 정확한 금액을 안내해 드립니다. 전화 0507-1314-5792 또는 온라인 견적 신청서를 이용해 주세요.</p></div></div></div></div></div>
   </div>
 </section>
@@ -550,22 +551,22 @@
     <div class="ftr__top">
       <div>
         <a class="brand" href="index.html"><img src="assets/img/logo-64.png" width="34" height="34" alt=""><span>인프케어<small>INPE CARE</small></span></a>
-        <p>반려견·반려묘와 함께 사는 집을 위한 소파 · 매트리스 청소, 소변 냄새 제거, 파보 · 칼리시 바이러스 방역 서비스. 인천 남동구 본사, 서울 · 인천 · 경기 출장비 무료.</p>
+        <p>반려견·반려묘와 함께 사는 집을 위한 소파·매트리스 청소, 소변 냄새 제거, 파보·칼리시 바이러스 방역 서비스. 인천 남동구 본사, 서울·인천·경기 출장비 무료.</p>
       </div>
       <div>
         <h4>서비스</h4>
         <ul>
           <li><a href="pet-urine.html">반려동물 소변 청소</a></li>
-          <li><a href="pet-virus.html">파보 · 칼리시 방역</a></li>
-          <li><a href="index.html#services">소파 · 매트리스 딥클린</a></li>
-          <li><a href="price.html">가격표 · 견적 계산</a></li>
+          <li><a href="pet-virus.html">파보·칼리시 방역</a></li>
+          <li><a href="index.html#services">소파·매트리스 딥클린</a></li>
+          <li><a href="price.html">가격표·견적 계산</a></li>
         </ul>
       </div>
       <div>
         <h4>회사</h4>
         <ul>
           <li><a href="about.html">회사 소개</a></li>
-          <li><a href="about.html#partners">제휴 · 가맹 문의</a></li>
+          <li><a href="about.html#partners">제휴·가맹 문의</a></li>
           <li><a href="about.html#careers">채용</a></li>
           <li><a href="https://blog.naver.com/apso11" target="_blank" rel="noopener">공식 블로그</a></li>
         </ul>
@@ -581,9 +582,8 @@
       </div>
     </div>
     <div class="ftr__biz">
-      <p><span>상호 : 주식회사 인프 (브랜드 인프케어 · INPE CARE)</span><span>대표자 : 이은수</span><span>사업자등록번호 : 868-06-01765</span></p>
+      <p><span>상호 : 주식회사 인프 (브랜드 인프케어·INPE CARE)</span><span>대표자 : 이은수</span><span>사업자등록번호 : 868-06-01765</span></p>
       <p><span>주소 : 인천광역시 남동구 인주대로 770-1, 3층 하나빌딩</span><span>대표전화 : 0507-1314-5792</span><span>이메일 : info@inpe.kr</span></p>
-      <p>※ 인프케어는 성격유형(MBTI)의 ‘인프(INFP)’와 관련 없는 반려동물 홈케어 · 방역 서비스 브랜드입니다.</p>
       <p>© <span data-year>2026</span> INPE Co., Ltd. All rights reserved.</p>
     </div>
   </div>
@@ -612,8 +612,8 @@
     <nav class="mnav">
       <a href="index.html">홈<svg class="ico"><use href="#i-right"/></svg></a>
       <a href="pet-urine.html">반려동물 소변청소<svg class="ico"><use href="#i-right"/></svg></a>
-      <a href="pet-virus.html">파보 · 칼리시 방역<svg class="ico"><use href="#i-right"/></svg></a>
-      <a href="price.html">가격표 · 견적 계산<svg class="ico"><use href="#i-right"/></svg></a>
+      <a href="pet-virus.html">파보·칼리시 방역<svg class="ico"><use href="#i-right"/></svg></a>
+      <a href="price.html">가격표·견적 계산<svg class="ico"><use href="#i-right"/></svg></a>
       <a href="index.html#proof">시공 사례<svg class="ico"><use href="#i-right"/></svg></a>
       <a href="about.html">회사 소개<svg class="ico"><use href="#i-right"/></svg></a>
     </nav>
@@ -628,9 +628,9 @@
 <aside class="drawer" id="drawer-quote" aria-hidden="true" aria-labelledby="dq-title" data-focus=".qstep:not([hidden]) input">
   <div class="drawer__head"><h2 id="dq-title">무료 견적 신청</h2><button class="x-btn" type="button" data-close aria-label="신청서 닫기"><svg class="ico"><use href="#i-x"/></svg></button></div>
   <div class="drawer__body">
-    <p class="muted" style="font-size:14px;margin-bottom:18px">1분이면 끝납니다. 영업시간 내 담당자가 직접 연락드리고, 사진을 주시면 방문 전에 금액을 확정해 드립니다.</p>
+    <p class="muted" style="font-size:14px;margin-bottom:18px">영업시간 안에 담당자가 직접 연락드립니다. 오염 사진이 있으면 함께 올려주세요.</p>
     <form class="qform" data-form="dq" novalidate aria-label="무료 견적 신청서">
-  <ol class="qform__steps" aria-hidden="true"><li>서비스</li><li>상태 · 사진</li><li>지역 · 일정</li><li>연락처</li></ol>
+  <ol class="qform__steps" aria-hidden="true"><li>서비스</li><li>상태·사진</li><li>지역·일정</li><li>연락처</li></ol>
 
   <fieldset class="qstep" data-need="items" style="border:0;padding:0;margin:0">
     <h3>무엇을 맡기시나요?</h3>
@@ -639,7 +639,7 @@
       <div class="seg">
         <input type="checkbox" name="items" id="dq-i1" value="소파"><label for="dq-i1">소파</label>
         <input type="checkbox" name="items" id="dq-i2" value="매트리스"><label for="dq-i2">매트리스</label>
-        <input type="checkbox" name="items" id="dq-i3" value="카펫·러그"><label for="dq-i3">카펫 · 러그</label>
+        <input type="checkbox" name="items" id="dq-i3" value="카펫·러그"><label for="dq-i3">카펫·러그</label>
         <input type="checkbox" name="items" id="dq-i4" value="반려동물 방역"><label for="dq-i4">반려동물 방역</label>
         <input type="checkbox" name="items" id="dq-i5" value="기타"><label for="dq-i5">기타</label>
       </div>
@@ -648,11 +648,11 @@
     <div class="field">
       <span class="label">반려동물 상황</span>
       <div class="seg">
-        <input type="checkbox" name="pet" id="dq-p1" value="소변·배변 오염"><label for="dq-p1">소변 · 배변 오염</label>
+        <input type="checkbox" name="pet" id="dq-p1" value="소변·배변 오염"><label for="dq-p1">소변·배변 오염</label>
         <input type="checkbox" name="pet" id="dq-p2" value="구토 오염"><label for="dq-p2">구토 오염</label>
-        <input type="checkbox" name="pet" id="dq-p3" value="털·비듬·냄새"><label for="dq-p3">털 · 비듬 · 냄새</label>
-        <input type="checkbox" name="pet" id="dq-p4" value="파보·칼리시 감염 후"><label for="dq-p4">파보 · 칼리시 감염 후</label>
-        <input type="checkbox" name="pet" id="dq-p5" value="예방·정기 관리"><label for="dq-p5">예방 · 정기 관리</label>
+        <input type="checkbox" name="pet" id="dq-p3" value="털·비듬·냄새"><label for="dq-p3">털·비듬·냄새</label>
+        <input type="checkbox" name="pet" id="dq-p4" value="파보·칼리시 감염 후"><label for="dq-p4">파보·칼리시 감염 후</label>
+        <input type="checkbox" name="pet" id="dq-p5" value="예방·정기 관리"><label for="dq-p5">예방·정기 관리</label>
       </div>
     </div>
     <div class="field">
@@ -661,7 +661,7 @@
         <input type="radio" name="petType" id="dq-t1" value="강아지" checked><label for="dq-t1">강아지</label>
         <input type="radio" name="petType" id="dq-t2" value="고양이"><label for="dq-t2">고양이</label>
         <input type="radio" name="petType" id="dq-t3" value="강아지·고양이"><label for="dq-t3">둘 다</label>
-        <input type="radio" name="petType" id="dq-t4" value="기타·없음"><label for="dq-t4">기타 · 없음</label>
+        <input type="radio" name="petType" id="dq-t4" value="기타·없음"><label for="dq-t4">기타·없음</label>
       </div>
     </div>
   </fieldset>
@@ -669,14 +669,14 @@
   <fieldset class="qstep" style="border:0;padding:0;margin:0" hidden>
     <h3>상태를 알려주시면 더 정확해져요</h3>
     <div class="field">
-      <label for="dq-detail">사이즈 · 수량 · 오염 위치</label>
+      <label for="dq-detail">사이즈·수량·오염 위치</label>
       <textarea class="textarea" id="dq-detail" name="detail" placeholder="예) 퀸 매트리스 1개, 3인 패브릭 소파. 매트리스 가운데 소변 자국 2군데, 냄새가 오래됨"></textarea>
     </div>
     <div class="field upl">
-      <span class="label">사진 첨부 <small class="muted">(선택 · 최대 3장)</small></span>
+      <span class="label">사진 첨부 <small class="muted">(선택·최대 3장)</small></span>
       <label class="upl__drop" for="dq-file">
         <svg class="ico"><use href="#i-camera"/></svg>
-        <span><b>오염 부위 사진을 올려주세요</b><small>방문 전에 금액을 확정해 드립니다. 자동으로 용량을 줄여 전송합니다.</small></span>
+        <span><b>오염 부위 사진을 올려주세요</b><small>사진을 보고 금액을 정확히 안내드립니다. 용량은 자동으로 줄여서 보냅니다.</small></span>
       </label>
       <input class="sr-only" type="file" id="dq-file" accept="image/*" multiple>
       <div class="upl__list"></div>
@@ -695,7 +695,7 @@
         <p class="field__err">지역을 선택해 주세요.</p>
       </div>
       <div class="field">
-        <label for="dq-area">시 · 구 · 동</label>
+        <label for="dq-area">시·구·동</label>
         <input class="input" id="dq-area" name="area" placeholder="예) 남동구 구월동" autocomplete="address-level2">
       </div>
     </div>
@@ -711,7 +711,7 @@
         </select>
       </div>
     </div>
-    <p class="note"><svg class="ico"><use href="#i-pin"/></svg><span>서울 · 인천 · 경기는 출장비가 없습니다. 도서 · 산간 지역은 상담 시 안내드립니다.</span></p>
+    <p class="note"><svg class="ico"><use href="#i-pin"/></svg><span>서울·인천·경기는 출장비가 없습니다. 도서·산간 지역은 상담 시 안내드립니다.</span></p>
   </fieldset>
 
   <fieldset class="qstep" data-need="contact" style="border:0;padding:0;margin:0" hidden>
@@ -731,7 +731,7 @@
     <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
     <div class="qform__summary" aria-live="polite"></div>
     <div class="field">
-      <div class="consent"><input type="checkbox" name="agree" id="dq-agree"><label for="dq-agree">[필수] 견적 상담을 위한 개인정보(성함 · 연락처 · 지역 · 사진) 수집 · 이용에 동의합니다. 상담 종료 후 1년 보관 뒤 파기합니다.</label><button type="button" data-open="modal-privacy">자세히</button></div>
+      <div class="consent"><input type="checkbox" name="agree" id="dq-agree"><label for="dq-agree">[필수] 견적 상담을 위한 개인정보(성함·연락처·지역·사진) 수집·이용에 동의합니다. 상담 종료 후 1년 보관 뒤 파기합니다.</label><button type="button" data-open="modal-privacy">자세히</button></div>
       <p class="field__err">개인정보 수집·이용에 동의해 주세요.</p>
     </div>
   </fieldset>
@@ -766,13 +766,13 @@
 <div class="modal" id="modal-privacy" role="dialog" aria-modal="true" aria-labelledby="pv-title" aria-hidden="true">
   <div class="modal__box">
     <button class="x-btn modal__x" type="button" data-close aria-label="닫기"><svg class="ico"><use href="#i-x"/></svg></button>
-    <h2 class="h-3" id="pv-title">개인정보 수집 · 이용 안내</h2>
+    <h2 class="h-3" id="pv-title">개인정보 수집·이용 안내</h2>
     <table class="ptable" style="margin-top:16px">
       <tbody>
-        <tr><td>수집 항목</td><td style="text-align:left">성함, 연락처, 방문 지역, (선택) 오염 사진 · 상담 내용</td></tr>
+        <tr><td>수집 항목</td><td style="text-align:left">성함, 연락처, 방문 지역, (선택) 오염 사진·상담 내용</td></tr>
         <tr><td>이용 목적</td><td style="text-align:left">견적 산정, 상담 연락, 방문 일정 안내</td></tr>
         <tr><td>보유 기간</td><td style="text-align:left">상담 종료 후 1년 (관계 법령에 따른 보존 기간이 있으면 그에 따름)</td></tr>
-        <tr><td>처리 위탁</td><td style="text-align:left">Google LLC (신청서 저장 · 알림 메일)</td></tr>
+        <tr><td>처리 위탁</td><td style="text-align:left">Google LLC (신청서 저장·알림 메일)</td></tr>
       </tbody>
     </table>
     <p class="muted" style="font-size:14px;margin-top:14px">동의를 거부할 수 있으며, 이 경우 온라인 견적 신청은 어렵고 전화 상담은 가능합니다. 전체 내용은 <a class="accent" href="privacy.html">개인정보처리방침</a>에서 확인하실 수 있습니다.</p>
@@ -798,7 +798,7 @@
   </div>
 </div>
 
-<script src="assets/js/config.js?v=202610081146"></script>
-<script src="assets/js/app.js?v=202610081146" defer></script>
+<script src="assets/js/config.js?v=202610081228"></script>
+<script src="assets/js/app.js?v=202610081228" defer></script>
 </body>
 </html>

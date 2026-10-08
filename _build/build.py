@@ -106,13 +106,13 @@ PCARDS = [
 def pcards_html():
     out = []
     for f, b, cf, cb in PCARDS:
-        out.append(f'<div class="pcard rv" tabindex="0" role="button" aria-label="{cf} 사진, 눌러서 흡입 필터 보기"><div class="pcard__in"><div class="pcard__f"><img src="assets/img/real/thumb/{f}.webp" alt="인프케어 시공 {cf}" loading="lazy"><span class="pcard__label">{cf}<em>FRONT</em></span></div><div class="pcard__b"><img src="assets/img/real/thumb/{b}.webp" alt="{cb}: 흡입된 먼지와 털" loading="lazy"><span class="pcard__label">{cb}<em>FILTER</em></span></div></div></div>')
+        out.append(f'<div class="pcard rv" tabindex="0" role="button" aria-label="{cf} 사진, 눌러서 흡입 필터 보기"><div class="pcard__in"><div class="pcard__f"><img src="assets/img/real/thumb/{f}.webp" alt="인프케어 시공 {cf}" loading="lazy"><span class="pcard__label">{cf}<em>가구</em></span></div><div class="pcard__b"><img src="assets/img/real/thumb/{b}.webp" alt="{cb}: 흡입된 먼지와 털" loading="lazy"><span class="pcard__label">{cb}<em>필터</em></span></div></div></div>')
     return '\n'.join(out)
 
 GALLERY = [
  ('sofa-01', '거실 모듈 소파 시공'), ('dust-bin-01', '흡입기 집진통에 모인 오염물'), ('mattress-02', '화이트 매트리스 시공'),
  ('dust-pad-04', '소파 흡입 필터'), ('sofa-under-01', '소파 하부 · 틈새 청소'), ('dust-hand', '필터에 걸러진 먼지와 털'),
- ('sofa-04', '서재 소파 시공'), ('dust-pad-05', '매트리스 흡입 필터'), ('tech-mattress', '매트리스 스팀 클렌징'),
+ ('sofa-04', '서재 소파 시공'), ('dust-pad-05', '매트리스 흡입 필터'), ('dust-pad-07', '소파 흡입 필터'),
  ('dust-bin-02', '집진통 오염물'), ('fabric-macro', '패브릭 표면 클로즈업'), ('team-back', '인프케어 현장팀'),
 ]
 def gallery_html():
@@ -134,7 +134,8 @@ ORG = {
  '@type': 'Organization', '@id': SITE + '#org', 'name': '주식회사 인프', 'legalName': '주식회사 인프',
  'alternateName': ['인프케어', 'INPE CARE', 'INPE', '인프'], 'url': SITE, 'logo': SITE + 'assets/img/logo-512.png',
  'email': 'info@inpe.kr', 'telephone': '+82-507-1314-5792', 'taxID': '868-06-01765', 'foundingDate': '2020',
- 'founder': {'@type': 'Person', 'name': '이은수'}, 'sameAs': ['https://blog.naver.com/apso11'],
+ 'founder': {'@type': 'Person', 'name': '이은수'},
+ 'disambiguatingDescription': '인프케어(INPE CARE)는 주식회사 인프의 반려동물 홈케어·방역 서비스 브랜드이며, 성격유형 MBTI의 INFP(인프)와는 관련이 없습니다.', 'sameAs': ['https://blog.naver.com/apso11'],
  'contactPoint': [{'@type': 'ContactPoint', 'contactType': 'customer service', 'telephone': '+82-507-1314-5792', 'email': 'info@inpe.kr', 'areaServed': 'KR', 'availableLanguage': ['Korean']}],
 }
 OFFERS = [
@@ -144,6 +145,7 @@ OFFERS = [
 ]
 BIZ = {
  '@type': 'LocalBusiness', '@id': SITE + '#business', 'name': '인프케어 (INPE CARE)', 'alternateName': ['인프케어', 'INPE CARE', '인프 홈케어'],
+ 'disambiguatingDescription': '성격유형 MBTI의 INFP(인프)가 아닌, 주식회사 인프의 반려동물 청소·방역 서비스입니다.',
  'description': '인프케어는 주식회사 인프가 운영하는 반려동물 가정 전문 소파·매트리스 청소와 바이러스 방역 서비스입니다. 강아지·고양이 소변 얼룩과 냄새 제거, 털·진드기 관리, 파보·칼리시 감염 후 생활 공간 방역을 제공합니다.',
  'url': SITE, 'image': [SITE + 'assets/img/og-inpecare.jpg', SITE + 'assets/img/real/team-back.jpg'], 'logo': SITE + 'assets/img/logo-512.png',
  'telephone': '+82-507-1314-5792', 'email': 'info@inpe.kr', 'priceRange': '₩20,000~₩149,000',
@@ -255,7 +257,7 @@ def build():
             hd = hd.replace(k, v)
         hdr = header.replace('{{hdr_class}}', '' if p['page'] == 'home' else ' is-solid-always')
         ft = footer.replace('{{quote_form_drawer}}', qf.replace('{{fid}}', 'dq')).replace('{{ver}}', VER)
-        out = hd + hdr + body + ft
+        out = hd + re.sub(r'(?<=[가-힣A-Za-z]) · (?=[가-힣A-Za-z])', '·', hdr + body + ft)
         left = re.findall(r'\{\{[a-z_]+\}\}', out)
         if left:
             raise SystemExit(f"{p['out']}: 치환 안 된 자리표시자 {left}")

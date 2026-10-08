@@ -18,13 +18,13 @@
     <div class="calc__group">
       <span class="calc__label">케어 방식 <small>반려동물 오염은 습건식 + 스팀 권장</small></span>
       <div class="seg">
-        <input type="radio" name="method" id="cm-dry" value="dry"><label for="cm-dry">건식 · 바로 사용</label>
-        <input type="radio" name="method" id="cm-wet" value="wet" checked><label for="cm-wet">습건식 + 스팀 · 3~5시간 건조</label>
+        <input type="radio" name="method" id="cm-dry" value="dry"><label for="cm-dry">건식 (바로 사용)</label>
+        <input type="radio" name="method" id="cm-wet" value="wet" checked><label for="cm-wet">습건식 + 스팀 (3~5시간 건조)</label>
       </div>
     </div>
     <div class="calc__group">
       <span class="calc__label">반려동물 상황</span>
-      <label class="toggle"><input type="checkbox" name="pet_urine"><span class="toggle__txt">소변 · 배변 · 구토 오염이 있어요<small>요산 결정까지 분해하는 습건식 + 스팀으로 진행</small></span><span class="toggle__sw" aria-hidden="true"></span></label>
+      <label class="toggle"><input type="checkbox" name="pet_urine"><span class="toggle__txt">소변 · 배변 · 구토 오염이 있어요<small>습건식 + 스팀으로 진행합니다</small></span><span class="toggle__sw" aria-hidden="true"></span></label>
       <label class="toggle"><input type="checkbox" name="pet_hair"><span class="toggle__txt">털 · 비듬 · 체취가 신경 쓰여요<small>고성능 흡입 + 음이온 탈취 마감 (추가 비용 없음)</small></span><span class="toggle__sw" aria-hidden="true"></span></label>
       <label class="toggle"><input type="checkbox" name="pet_virus"><span class="toggle__txt">파보 · 칼리시 감염 이력이 있어요<small>반려동물 바이러스 방역 149,000원~ (10평 기준, 평형별 차등)</small></span><span class="toggle__sw" aria-hidden="true"></span></label>
     </div>
@@ -33,7 +33,7 @@
     <span class="eyebrow">예상 금액</span>
     <p class="calc__total"><b class="num" id="calc-total">0</b><span>원</span></p>
     <ul class="calc__lines" id="calc-lines"></ul>
-    <p class="calc__hint" id="calc-hint" hidden><svg class="ico"><use href="#i-paw"/></svg><span>반려동물 오염은 상태에 따라 공정이 달라질 수 있어 사진을 함께 보내주시면 방문 전에 금액을 확정해 드립니다.</span></p>
+    <p class="calc__hint" id="calc-hint" hidden><svg class="ico"><use href="#i-paw"/></svg><span>오염 상태에 따라 공정이 달라질 수 있습니다. 신청할 때 사진을 함께 올려주세요.</span></p>
     <button class="btn btn--primary btn--lg btn--block" type="button" id="calc-go">이 견적으로 상담 신청</button>
     <p class="calc__note">인프케어 공개 가격표 기준 금액입니다. 오염 정도 · 소재 · 현장 여건에 따라 달라질 수 있으며, 최종 금액은 방문 전 안내드립니다.</p>
   </aside>
