@@ -32,7 +32,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css?v=202610081228">
+<link rel="stylesheet" href="assets/css/style.css?v=202610141213">
 <link rel="preload" as="image" href="assets/img/real/sofa-01.jpg">
 <script type="application/ld+json">
 {
@@ -261,7 +261,7 @@
    "breadcrumb": {
     "@id": "https://inpe.kr/#breadcrumb"
    },
-   "dateModified": "2026-10-08"
+   "dateModified": "2026-10-14"
   },
   {
    "@type": "BreadcrumbList",
@@ -367,7 +367,7 @@
    "name": "인프케어 현장 쇼릴 (15초)",
    "description": "인프케어의 반려견 소파·매트리스 시공, 소변 얼룩 제거 전후, 흡입 필터, 파보·칼리시 방역을 담은 15초 영상",
    "thumbnailUrl": "https://inpe.kr/assets/video/poster-desktop.jpg",
-   "uploadDate": "2026-10-08T09:00:00+09:00",
+   "uploadDate": "2026-10-14T09:00:00+09:00",
    "duration": "PT15S",
    "contentUrl": "https://inpe.kr/assets/video/inpecare-reel-1080p.mp4",
    "publisher": {
@@ -664,19 +664,13 @@
     <div class="rv"><div class="calc">
   <form class="calc__panel" id="calc" onsubmit="return false" aria-label="소파·매트리스 청소 견적 계산기">
     <div class="calc__group">
-      <label class="toggle"><input type="checkbox" name="use_mattress" checked><span class="toggle__txt">매트리스<small>UV 살균·고성능 흡입·얼룩 제거·탈취 포함</small></span><span class="toggle__sw" aria-hidden="true"></span></label>
-      <div class="row2">
-        <select class="select" name="mattress_size" aria-label="매트리스 사이즈">
-          <option value="baby">유아용</option><option value="single">싱글</option><option value="ss">슈퍼싱글</option><option value="queen" selected>퀸</option><option value="king">킹</option><option value="lking">라지킹</option><option value="family">패밀리 (싱글+퀸)</option>
-        </select>
-        <select class="select" name="mattress_qty" aria-label="매트리스 수량"><option value="1">1개</option><option value="2">2개</option><option value="3">3개</option></select>
+      <span class="calc__label">품목 <small>매트리스·소파를 여러 개 담을 수 있어요</small></span>
+      <div class="citems" id="calc-items" aria-live="polite"></div>
+      <div class="citems__add">
+        <button class="btn btn--ghost btn--sm" type="button" data-add="mattress">+ 매트리스 추가</button>
+        <button class="btn btn--ghost btn--sm" type="button" data-add="sofa">+ 소파 추가</button>
       </div>
-    </div>
-    <div class="calc__group">
-      <label class="toggle"><input type="checkbox" name="use_sofa"><span class="toggle__txt">소파<small>패브릭 소재 기준·카우치형은 1만원 추가</small></span><span class="toggle__sw" aria-hidden="true"></span></label>
-      <select class="select" name="sofa_size" aria-label="소파 크기" disabled>
-        <option value="s1">1인용</option><option value="s2">2인용</option><option value="s3" selected>3인용</option><option value="s4">4인용</option><option value="s4c">4인용 카우치</option><option value="s5">5인용</option><option value="s5c">5인용 카우치</option><option value="s6">6인용</option><option value="s6c">6인용 카우치</option>
-      </select>
+      <p class="calc__fine">UV 살균·고성능 흡입·얼룩 제거·탈취 포함. 소파는 패브릭 기준이며 카우치형은 1만원이 추가됩니다.</p>
     </div>
     <div class="calc__group">
       <span class="calc__label">케어 방식 <small>반려동물 오염은 습건식 + 스팀 권장</small></span>
@@ -1199,7 +1193,7 @@
   </div>
 </div>
 
-<script src="assets/js/config.js?v=202610081228"></script>
-<script src="assets/js/app.js?v=202610081228" defer></script>
+<script src="assets/js/config.js?v=202610141213"></script>
+<script src="assets/js/app.js?v=202610141213" defer></script>
 </body>
 </html>

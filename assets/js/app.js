@@ -450,21 +450,40 @@
   var lastCalc = null;
   function initCalc() {
     var F = $('#calc'); if (!F) return;
-    var out = { total: $('#calc-total'), lines: $('#calc-lines'), hint: $('#calc-hint') };
+    var out = { total: $('#calc-total'), lines: $('#calc-lines'), hint: $('#calc-hint') }, list = $('#calc-items');
+    var LABEL = { mattress: '매트리스', sofa: '소파' }, DEF = { mattress: 'queen', sofa: 's3' }, MAXROW = 10, MAXQ = 10;
     var warned = false;
     function val(n) { var e = F.querySelector('[name="' + n + '"]:checked'); return e ? e.value : null; }
     function on(n) { var e = F.querySelector('[name="' + n + '"]'); return e && e.checked; }
+    function addRow(type, size, qty, quiet) {
+      if ($$('.citem', list).length >= MAXROW) { toast('품목은 ' + MAXROW + '줄까지 담을 수 있습니다. 더 많으면 상담 때 알려주세요.', { type: 'info' }); return; }
+      var row = document.createElement('div'); row.className = 'citem'; row.dataset.type = type;
+      var opts = Object.keys(PRICE[type]).map(function (k) { return '<option value="' + k + '"' + (k === (size || DEF[type]) ? ' selected' : '') + '>' + PRICE[type][k][0] + '</option>'; }).join('');
+      row.innerHTML = '<span class="citem__type">' + LABEL[type] + '</span><select class="select citem__size" aria-label="' + LABEL[type] + ' 사이즈">' + opts + '</select>' +
+        '<span class="stepper"><button type="button" data-step="-1" aria-label="' + LABEL[type] + ' 수량 줄이기">−</button><output aria-label="수량">' + (qty || 1) + '</output><button type="button" data-step="1" aria-label="' + LABEL[type] + ' 수량 늘리기">+</button></span>' +
+        '<button class="citem__x" type="button" aria-label="' + LABEL[type] + ' 빼기"><svg class="ico"><use href="#i-x"/></svg></button>';
+      list.appendChild(row);
+      if (!quiet) $('select', row).focus();
+      calc();
+    }
+    function rows() {
+      return $$('.citem', list).map(function (r) { var t = r.dataset.type, k = $('select', r).value; return { type: t, key: k, name: PRICE[t][k][0], qty: +$('output', r).textContent || 1, el: r }; });
+    }
     function calc(ev) {
-      var method = val('method'), wet = method === 'wet', lines = [], total = 0, items = [];
+      var wet = val('method') === 'wet', lines = [], total = 0, items = [];
       if (on('pet_urine') && !wet) {
-        F.querySelector('[name="method"][value="wet"]').checked = true; wet = true; method = 'wet';
+        F.querySelector('[name="method"][value="wet"]').checked = true; wet = true;
         if (ev && ev.target && ev.target.name === 'pet_urine' && !warned) { warned = true; toast('소변·배변 오염은 요산이 섬유 안쪽까지 스며들어 건식으로는 냄새가 남습니다. <b>습건식 + 스팀</b>으로 자동 변경했습니다.', { title: '케어 방식 변경', type: 'info', timeout: 6500 }); }
       }
       out.hint.hidden = !(on('pet_urine') || on('pet_virus'));
-      var mm = on('use_mattress') && PRICE.mattress[F.mattress_size.value], ss = on('use_sofa') && PRICE.sofa[F.sofa_size.value];
-      F.mattress_size.disabled = !on('use_mattress'); F.mattress_qty.disabled = !on('use_mattress'); F.sofa_size.disabled = !on('use_sofa');
-      if (mm) { var q = +F.mattress_qty.value || 1, pm = (wet ? mm[2] : mm[1]) * q; total += pm; lines.push(['매트리스 ' + mm[0] + (q > 1 ? ' × ' + q : ''), pm]); items.push('매트리스 ' + mm[0] + (q > 1 ? ' ' + q + '개' : '')); }
-      if (ss) { var ps = wet ? ss[2] : ss[1]; total += ps; lines.push(['소파 ' + ss[0], ps]); items.push('소파 ' + ss[0]); }
+      var rs = rows(), em = $('.citems__empty', list);
+      if (!rs.length && !em) list.insertAdjacentHTML('beforeend', '<p class="citems__empty">담긴 품목이 없습니다. 아래 버튼으로 추가해 주세요.</p>');
+      if (rs.length && em) em.remove();
+      rs.forEach(function (r) {
+        var unit = PRICE[r.type][r.key][wet ? 2 : 1], sum = unit * r.qty, label = LABEL[r.type] + ' ' + r.name;
+        total += sum; lines.push([label + (r.qty > 1 ? ' × ' + r.qty : ''), sum]); items.push(label + (r.qty > 1 ? ' ' + r.qty + '개' : ''));
+        $('[data-step="-1"]', r.el).disabled = r.qty <= 1; $('[data-step="1"]', r.el).disabled = r.qty >= MAXQ;
+      });
       if (on('pet_virus')) { total += PRICE.disinfect; lines.push(['반려동물 바이러스 방역 (10평 기준~)', PRICE.disinfect]); items.push('반려동물 방역'); }
       lines.push(['출장비 (수도권)', 0]);
       out.total.textContent = total.toLocaleString('ko-KR');
@@ -472,11 +491,18 @@
       var pet = []; if (on('pet_urine')) pet.push('소변·배변 오염'); if (on('pet_hair')) pet.push('털·냄새'); if (on('pet_virus')) pet.push('감염 후 방역');
       lastCalc = { total: total, method: wet ? '습건식+스팀' : '건식', items: items, pet: pet, text: items.join(', ') + ' / ' + (wet ? '습건식+스팀' : '건식') + ' / 예상 ' + won(total) + (on('pet_virus') ? '~' : '') };
     }
+    list.addEventListener('click', function (e) {
+      var r = e.target.closest('.citem'); if (!r) return;
+      var st = e.target.closest('[data-step]');
+      if (st) { var o = $('output', r); o.textContent = clamp((+o.textContent || 1) + (+st.dataset.step), 1, MAXQ); calc(); return; }
+      if (e.target.closest('.citem__x')) { var type = r.dataset.type; r.remove(); calc(); var add = $('[data-add="' + type + '"]', F); if (add) add.focus(); }
+    });
+    $$('[data-add]', F).forEach(function (b) { b.addEventListener('click', function () { addRow(b.dataset.add); Track.ev('calc_add_item', { type: b.dataset.add }); }); });
     F.addEventListener('change', calc);
-    calc();
+    addRow('mattress', 'queen', 1, true);
     var go = $('#calc-go');
     if (go) go.addEventListener('click', function () {
-      if (!lastCalc || !lastCalc.total) { toast('매트리스나 소파 중 하나 이상 선택해 주세요.', { type: 'err' }); return; }
+      if (!lastCalc || !lastCalc.total) { toast('매트리스나 소파를 하나 이상 담아 주세요.', { type: 'err' }); return; }
       Track.ev('calc_to_form', { value: lastCalc.total });
       var d = document.getElementById('drawer-quote');
       Form.prefill(d, lastCalc);

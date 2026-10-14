@@ -81,10 +81,21 @@ const results = []; const ok = (name, cond, info = '') => { results.push([cond ?
   await d.click('label.toggle:has(input[name=pet_urine])'); await sleep(500);
   st = await d.evaluate(() => ({ wet: document.getElementById('cm-wet').checked, total: document.getElementById('calc-total').textContent, toast: !!document.querySelector('.toast') }));
   ok('소변 선택 → 습건식 자동 전환 + 토스트', st.wet && st.total === '80,000' && st.toast, JSON.stringify(st));
-  await d.click('label.toggle:has(input[name=use_sofa])'); await d.select('select[name=sofa_size]', 's4c'); await d.click('label.toggle:has(input[name=pet_virus])'); await sleep(300);
+  await d.click('[data-add=sofa]'); await sleep(200); await d.select('.citem[data-type=sofa] select', 's4c'); await d.click('label.toggle:has(input[name=pet_virus])'); await sleep(300);
   t1 = await d.evaluate(() => document.getElementById('calc-total').textContent);
   ok('퀸 습건식 80,000 + 4인 카우치 100,000 + 방역 149,000 = 329,000', t1 === '329,000', t1);
+  await d.click('[data-add=mattress]'); await sleep(200);
+  await d.select('.citem:nth-child(3) select', 'single'); await d.click('.citem:nth-child(3) [data-step="1"]'); await sleep(200);
+  t1 = await d.evaluate(() => document.getElementById('calc-total').textContent);
+  ok('품목 중복: 싱글 매트리스 2개 추가 → 449,000', t1 === '449,000', t1);
   await shot(d, '16_calc');
+  await d.click('.citem:nth-child(3) .citem__x'); await sleep(200);
+  t1 = await d.evaluate(() => document.getElementById('calc-total').textContent);
+  ok('품목 빼기 → 329,000', t1 === '329,000', t1);
+  await d.evaluate(() => document.getElementById('reviews').scrollIntoView()); await sleep(1800);
+  const statFs = await d.evaluate(() => [...document.querySelectorAll('#reviews .stat b span')].map(s => parseFloat(getComputedStyle(s).fontSize)));
+  ok('후기 숫자 크기 (40px 이상)', statFs.length === 4 && statFs.every(x => x >= 40), statFs.join(','));
+  await d.evaluate(() => document.getElementById('calculator').scrollIntoView()); await sleep(600);
   // 견적 드로어 → 제출 (가짜 엔드포인트)
   await d.evaluate(() => { window.INPE_CONFIG.LEAD_ENDPOINT = location.origin + '/__mock/lead'; });
   await d.click('#calc-go'); await sleep(900);
